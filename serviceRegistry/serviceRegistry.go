@@ -45,6 +45,7 @@ func (NodeHandler) ManageNode(peerAddress utils.PeerAddr, nodeInfo *utils.NodeIN
 		peer, err := rpc.Dial("tcp", node.Address)
 		if err != nil {
 			log.Printf("Errore di connessione: %v", err)
+			continue
 		}
 
 		err = peer.Call("NodeListUpdate.UpdateList", newNode, nil)

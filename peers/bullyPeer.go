@@ -138,13 +138,12 @@ func main() {
 }
 
 func bully() {
-	fmt.Print("Start bully algorithm? Reply with Y to continue: ")
+	fmt.Print("Start bully algorithm? Reply with Y to continue\n")
 
 	if keyboardInput() == "Y" {
 		for _, node := range currentNode.List.GetAllNodes() {
 			if node.Leader == true {
 				peer, err := rpc.Dial("tcp", node.Address)
-
 				// TODO: qui capisco che il nodo leader non risponde più quindi devo indire la nuova elezione e gestire il crash
 				if err != nil {
 					log.Printf("Errore di connessione: %v", err)
