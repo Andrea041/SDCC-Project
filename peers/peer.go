@@ -110,7 +110,7 @@ func main() {
 
 		fmt.Println("--- Choose algorithm ---")
 		fmt.Println("1 - Bully")
-		fmt.Println("2 - ...")
+		fmt.Println("2 - Chang & Robert")
 		go chooseAlgorithm()
 	}
 }
@@ -123,7 +123,7 @@ func chooseAlgorithm() {
 	case "1":
 		go algorithm.Bully(currentNode)
 	case "2":
-		fmt.Println("Developing...")
+		go algorithm.ChangAndRobert(currentNode)
 	default:
 		fmt.Println("Invalid input")
 	}
