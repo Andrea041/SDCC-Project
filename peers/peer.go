@@ -1,63 +1,14 @@
 package main
 
 import (
+	"SDCCproject/algorithm"
 	"SDCCproject/utils"
-	"bufio"
+
 	"fmt"
 	"log"
 	"net"
 	"net/rpc"
-	"os"
-	"strconv"
 )
-
-func getAddress() (string, error) {
-	addrs, err := net.InterfaceAddrs()
-	if err != nil {
-		return "", err
-	}
-
-	var ip string
-	for _, addr := range addrs {
-		if ipNet, ok := addr.(*net.IPNet); ok && !ipNet.IP.IsLoopback() && ipNet.IP.To4() != nil {
-			ip = ipNet.IP.String()
-			break
-		}
-	}
-
-	if ip == "" {
-		return "", fmt.Errorf("indirizzo IP locale non trovato")
-	}
-
-	// Ottieni una porta disponibile
-	listener, err := net.Listen("tcp", ":0")
-	if err != nil {
-		return "", fmt.Errorf("impossibile ottenere una porta disponibile: %v", err)
-	}
-
-	defer func(listener net.Listener) {
-		err := listener.Close()
-		if err != nil {
-
-		}
-	}(listener)
-
-	// Ottieni l'indirizzo e la porta dell'ascoltatore
-	addr := listener.Addr().(*net.TCPAddr)
-
-	return ip + ":" + strconv.Itoa(addr.Port), nil
-}
-
-func keyboardInput() string {
-	var scanner *bufio.Scanner
-
-	scanner = bufio.NewScanner(os.Stdin)
-	scanner.Scan()
-	if err := scanner.Err(); err != nil {
-		log.Fatal("Errore nell'acquisizione dell'input: ", err)
-	}
-	return scanner.Text()
-}
 
 // Global variable to hold peers in DS
 var currentNode utils.NodeINFO
@@ -80,8 +31,33 @@ func (NodeListUpdate) CheckLeaderStatus(node utils.Node, _ *utils.NodeINFO) erro
 	return nil
 }
 
+func (NodeListUpdate) ElectionMessage(nodeCaller utils.NodeINFO, rep *string) error {
+	fmt.Printf("Election message from peer with id: %d\n", nodeCaller.Id)
+	*rep = "OK"
+
+	go algorithm.Bully(currentNode)
+
+	return nil
+}
+
+func (NodeListUpdate) NewLeader(leaderINFO utils.LeaderStatus, _ *utils.NodeINFO) error {
+	for _, node := range currentNode.List.GetAllNodes() {
+		if node.Id == leaderINFO.NewLeaderID {
+			currentNode.List.UpdateNode(node, true)
+		}
+
+		if node.Id == leaderINFO.OldLeaderID {
+			currentNode.List.UpdateNode(node, false)
+		}
+	}
+
+	fmt.Printf("List updated: %s\n", currentNode.List.GetAllNodes())
+
+	return nil
+}
+
 func main() {
-	address, err := getAddress()
+	address, err := utils.GetAddress()
 	if err != nil {
 		fmt.Println("Errore durante il recupero dell'indirizzo IP locale:", err)
 	}
@@ -132,35 +108,23 @@ func main() {
 		conn, _ := list.Accept()
 		go peer.ServeConn(conn)
 
-		/* Bully algorithm */
-		go bully()
+		fmt.Println("--- Choose algorithm ---")
+		fmt.Println("1 - Bully")
+		fmt.Println("2 - ...")
+		go chooseAlgorithm()
 	}
 }
 
-func bully() {
-	fmt.Print("Start bully algorithm? Reply with Y to continue\n")
+func chooseAlgorithm() {
+	// Algorithm
+	choose := utils.KeyboardInput()
 
-	if keyboardInput() == "Y" {
-		for _, node := range currentNode.List.GetAllNodes() {
-			if node.Leader == true {
-				peer, err := rpc.Dial("tcp", node.Address)
-				// TODO: qui capisco che il nodo leader non risponde più quindi devo indire la nuova elezione e gestire il crash
-				if err != nil {
-					log.Printf("Errore di connessione: %v", err)
-				}
-
-				err = peer.Call("NodeListUpdate.CheckLeaderStatus", node, nil)
-				if err != nil {
-					log.Printf("Errore durante l'aggiornamento del nodo: %v", err)
-				}
-
-				err = peer.Close()
-				if err != nil {
-					log.Fatalf("Errore durante l'aggiornamento del nodo: %v\n", err)
-				}
-			}
-		}
-	} else {
-		fmt.Println("Invalid input!!!")
+	switch choose {
+	case "1":
+		go algorithm.Bully(currentNode)
+	case "2":
+		fmt.Println("Developing...")
+	default:
+		fmt.Println("Invalid input")
 	}
 }

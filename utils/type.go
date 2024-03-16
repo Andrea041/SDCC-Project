@@ -20,10 +20,7 @@ type NodeINFO struct {
 	Leader bool
 }
 
-func (nl *NodeList) AddNode(node Node) {
-	nl.Nodes = append(nl.Nodes, node)
-}
-
-func (nl *NodeList) GetAllNodes() []Node {
-	return nl.Nodes
+type LeaderStatus struct {
+	NewLeaderID int
+	OldLeaderID int
 }
