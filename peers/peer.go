@@ -31,7 +31,7 @@ func (NodeListUpdate) CheckLeaderStatus(node utils.Node, _ *utils.NodeINFO) erro
 	return nil
 }
 
-func (NodeListUpdate) ElectionMessage(nodeCaller utils.NodeINFO, rep *string) error {
+func (NodeListUpdate) ElectionMessageBULLY(nodeCaller utils.NodeINFO, rep *string) error {
 	fmt.Printf("Election message from peer with id: %d\n", nodeCaller.Id)
 	*rep = "OK"
 
@@ -52,6 +52,46 @@ func (NodeListUpdate) NewLeader(leaderINFO utils.LeaderStatus, _ *utils.NodeINFO
 	}
 
 	fmt.Printf("List updated: %s\n", currentNode.List.GetAllNodes())
+
+	return nil
+}
+
+// TODO: Sistemare qui come nel mex di elezione
+func (NodeListUpdate) NewLeaderCR(leaderINFO utils.LeaderStatus, currNode utils.NodeINFO) error {
+	for _, node := range currentNode.List.GetAllNodes() {
+		if node.Id == leaderINFO.NewLeaderID {
+			currentNode.List.UpdateNode(node, true)
+		}
+
+		if node.Id == leaderINFO.OldLeaderID {
+			currentNode.List.UpdateNode(node, false)
+		}
+	}
+
+	fmt.Printf("List updated: %s\n", currentNode.List.GetAllNodes())
+
+	go algorithm.WinnerMessage(currNode.List.GetNode(currNode.Id + 1))
+
+	return nil
+}
+
+func (NodeListUpdate) ElectionMessageCR(mex utils.Message, _ *int) error {
+	currID := (mex.CurrNode.Id + mex.SkipCount) % len(mex.CurrNode.List.Nodes)
+	fmt.Printf("My message: %d, currID: %d, Skip: %d\n", mex.MexID, currID, mex.SkipCount)
+
+	if mex.MexID > currID {
+		fmt.Println("Here")
+		fmt.Printf("Rep1: %d\n", mex.MexID)
+		go algorithm.ElectionChangRobert(mex.CurrNode.List.GetNode(currID), mex.MexID)
+	} else if mex.MexID < currID && mex.CurrNode.Participant == false {
+		mex.MexID = currID
+		fmt.Printf("Rep2: %d\n", mex.MexID)
+		go algorithm.ElectionChangRobert(mex.CurrNode.List.GetNode(currID), mex.MexID)
+	} else if mex.MexID < currID && mex.CurrNode.Participant == true {
+		return nil
+	} else if mex.MexID == currID {
+		go algorithm.WinnerMessage(mex.CurrNode.List.GetNode(currID)) // passo il nodo leader da cui partire il giro di winning message
+	}
 
 	return nil
 }
@@ -100,23 +140,24 @@ func main() {
 		log.Fatal("Entering System error: ", err)
 	}
 
-	fmt.Printf("Peer INFO [ID: %d, Leader: %t, Address: %s]\n", peerRep.Id, peerRep.Leader, peerRep.List)
+	fmt.Printf("Peer INFO [ID: %d, Leader: %t, ListOfNode: %s, Address: %s]\n", peerRep.Id, peerRep.Leader, peerRep.List, address)
 	currentNode = peerRep
+	currentNode.Address = address
 
+	go chooseAlgorithm()
 	/* Listen for RPC */
 	for {
 		conn, _ := list.Accept()
 		go peer.ServeConn(conn)
-
-		fmt.Println("--- Choose algorithm ---")
-		fmt.Println("1 - Bully")
-		fmt.Println("2 - Chang & Robert")
-		go chooseAlgorithm()
 	}
 }
 
 func chooseAlgorithm() {
 	// Algorithm
+	fmt.Println("--- Choose algorithm ---")
+	fmt.Println("1 - Bully")
+	fmt.Println("2 - Chang & Robert")
+
 	choose := utils.KeyboardInput()
 
 	switch choose {

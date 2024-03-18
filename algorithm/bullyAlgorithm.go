@@ -7,7 +7,7 @@ import (
 	"net/rpc"
 )
 
-func election(currNode utils.NodeINFO, actualLeader utils.Node) {
+func electionBully(currNode utils.NodeINFO, actualLeader utils.Node) {
 	for _, node := range currNode.List.GetAllNodes() {
 		if node.Id > currNode.Id {
 			peer, err := rpc.Dial("tcp", node.Address)
@@ -16,7 +16,7 @@ func election(currNode utils.NodeINFO, actualLeader utils.Node) {
 			}
 
 			var repOK string
-			err = peer.Call("NodeListUpdate.ElectionMessage", currNode, &repOK)
+			err = peer.Call("NodeListUpdate.ElectionMessageBULLY", currNode, &repOK)
 			if err != nil {
 				log.Printf("Errore durante l'aggiornamento del nodo: %v", err)
 			}
@@ -60,7 +60,7 @@ func Bully(currNode utils.NodeINFO) {
 
 			if err != nil {
 				fmt.Println("--- Start new election ---")
-				election(currNode, node)
+				electionBully(currNode, node)
 				fmt.Println("--- Leader election terminated ---")
 				break
 			}

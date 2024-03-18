@@ -18,7 +18,7 @@ func (NodeHandler) ManageNode(peerAddress utils.PeerAddr, nodeInfo *utils.NodeIN
 	nodes := nodeList.GetAllNodes()
 
 	// Find max ID
-	maxID := 0
+	maxID := -1
 	for _, node := range nodes {
 		if node.Id > maxID {
 			maxID = node.Id
@@ -27,10 +27,10 @@ func (NodeHandler) ManageNode(peerAddress utils.PeerAddr, nodeInfo *utils.NodeIN
 	newID := maxID + 1
 
 	var newNode utils.Node
-	if newID == 1 {
-		newNode = utils.Node{Id: newID, Address: peerAddress.PeerAddress, Leader: true}
+	if newID == 0 {
+		newNode = utils.Node{Id: newID, Address: peerAddress.PeerAddress, Leader: true, Participant: false}
 	} else {
-		newNode = utils.Node{Id: newID, Address: peerAddress.PeerAddress, Leader: false}
+		newNode = utils.Node{Id: newID, Address: peerAddress.PeerAddress, Leader: false, Participant: false}
 	}
 
 	// Add new node to local list
