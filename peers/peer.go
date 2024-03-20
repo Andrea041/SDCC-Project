@@ -40,57 +40,76 @@ func (NodeListUpdate) ElectionMessageBULLY(nodeCaller utils.NodeINFO, rep *strin
 	return nil
 }
 
-func (NodeListUpdate) NewLeader(leaderINFO utils.LeaderStatus, _ *utils.NodeINFO) error {
-	for _, node := range currentNode.List.GetAllNodes() {
-		if node.Id == leaderINFO.NewLeaderID {
-			currentNode.List.UpdateNode(node, true)
-		}
+/*func (NodeListUpdate) NewLeader(leaderINFO utils.LeaderStatus, _ *utils.NodeINFO) error {
 
-		if node.Id == leaderINFO.OldLeaderID {
-			currentNode.List.UpdateNode(node, false)
-		}
-	}
 
 	fmt.Printf("List updated: %s\n", currentNode.List.GetAllNodes())
 
 	return nil
-}
+}*/
 
-// TODO: Sistemare qui come nel mex di elezione
-func (NodeListUpdate) NewLeaderCR(leaderINFO utils.LeaderStatus, currNode utils.NodeINFO) error {
-	for _, node := range currentNode.List.GetAllNodes() {
-		if node.Id == leaderINFO.NewLeaderID {
-			currentNode.List.UpdateNode(node, true)
-		}
+func (NodeListUpdate) NewLeaderCR(mex utils.Message, _ *utils.NodeINFO) error {
+	nextNode := (mex.CurrNode.Id + mex.SkipCount) % len(currentNode.List.Nodes)
 
-		if node.Id == leaderINFO.OldLeaderID {
-			currentNode.List.UpdateNode(node, false)
-		}
+	if currentNode.Leader != mex.MexID {
+		currentNode.Leader = mex.MexID
+	} else {
+		return nil
 	}
 
-	fmt.Printf("List updated: %s\n", currentNode.List.GetAllNodes())
-
-	go algorithm.WinnerMessage(currNode.List.GetNode(currNode.Id + 1))
+	go algorithm.WinnerMessage(currentNode.List.GetNode(nextNode), mex.MexID)
 
 	return nil
 }
 
 func (NodeListUpdate) ElectionMessageCR(mex utils.Message, _ *int) error {
-	currID := (mex.CurrNode.Id + mex.SkipCount) % len(mex.CurrNode.List.Nodes)
-	fmt.Printf("My message: %d, currID: %d, Skip: %d\n", mex.MexID, currID, mex.SkipCount)
+	currID := (mex.CurrNode.Id + mex.SkipCount) % len(currentNode.List.Nodes)
 
 	if mex.MexID > currID {
-		fmt.Println("Here")
-		fmt.Printf("Rep1: %d\n", mex.MexID)
-		go algorithm.ElectionChangRobert(mex.CurrNode.List.GetNode(currID), mex.MexID)
-	} else if mex.MexID < currID && mex.CurrNode.Participant == false {
+		go algorithm.ElectionChangRobert(currentNode.List.GetNode(currID), mex.MexID)
+	} else if mex.MexID < currID {
 		mex.MexID = currID
-		fmt.Printf("Rep2: %d\n", mex.MexID)
-		go algorithm.ElectionChangRobert(mex.CurrNode.List.GetNode(currID), mex.MexID)
-	} else if mex.MexID < currID && mex.CurrNode.Participant == true {
-		return nil
+		go algorithm.ElectionChangRobert(currentNode.List.GetNode(currID), mex.MexID)
 	} else if mex.MexID == currID {
-		go algorithm.WinnerMessage(mex.CurrNode.List.GetNode(currID)) // passo il nodo leader da cui partire il giro di winning message
+		info := utils.Message{
+			SkipCount: 0,
+			MexID:     mex.MexID,
+			CurrNode:  currentNode.List.GetNode(currID),
+		}
+
+		node := currentNode.List.GetNode(currID)
+		node.Leader = currID
+
+		peer, err := rpc.Dial("tcp", currentNode.List.GetNode((currentNode.Id+1)%len(currentNode.List.Nodes)).Address)
+		if err != nil {
+			skip := (currentNode.Id + 1) % len(currentNode.List.Nodes)
+			i := skip
+			for {
+				i++
+				pass := i % len(currentNode.List.Nodes)
+				if pass == skip-1 {
+					return nil
+				}
+
+				peer, err = rpc.Dial("tcp", currentNode.List.GetNode((currentNode.Id+i)%len(currentNode.List.Nodes)).Address)
+				info.SkipCount = i
+				if err != nil {
+					continue
+				} else {
+					break
+				}
+			}
+		}
+
+		err = peer.Call("NodeListUpdate.NewLeaderCR", info, nil)
+		if err != nil {
+			log.Printf("Errore durante l'aggiornamento del nodo: %v", err)
+		}
+
+		err = peer.Close()
+		if err != nil {
+			log.Fatalf("Errore durante l'aggiornamento del nodo: %v\n", err)
+		}
 	}
 
 	return nil
@@ -145,6 +164,7 @@ func main() {
 	currentNode.Address = address
 
 	go chooseAlgorithm()
+	// go printLeader() // active for testing new leader
 	/* Listen for RPC */
 	for {
 		conn, _ := list.Accept()
@@ -167,5 +187,11 @@ func chooseAlgorithm() {
 		go algorithm.ChangAndRobert(currentNode)
 	default:
 		fmt.Println("Invalid input")
+	}
+}
+
+func printLeader() {
+	for {
+		fmt.Printf("Il leader è: %d\n", currentNode.Leader)
 	}
 }

@@ -27,11 +27,7 @@ func (NodeHandler) ManageNode(peerAddress utils.PeerAddr, nodeInfo *utils.NodeIN
 	newID := maxID + 1
 
 	var newNode utils.Node
-	if newID == 0 {
-		newNode = utils.Node{Id: newID, Address: peerAddress.PeerAddress, Leader: true, Participant: false}
-	} else {
-		newNode = utils.Node{Id: newID, Address: peerAddress.PeerAddress, Leader: false, Participant: false}
-	}
+	newNode = utils.Node{Id: newID, Address: peerAddress.PeerAddress, Leader: 0}
 
 	// Add new node to local list
 	nodeList.AddNode(newNode)

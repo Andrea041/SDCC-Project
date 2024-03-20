@@ -1,10 +1,9 @@
 package utils
 
 type Node struct {
-	Id          int
-	Address     string
-	Leader      bool
-	Participant bool
+	Id      int
+	Address string
+	Leader  int // contiene l'ID del leader
 }
 
 type PeerAddr struct {
@@ -16,11 +15,10 @@ type NodeList struct {
 }
 
 type NodeINFO struct {
-	Id          int
-	Address     string
-	List        NodeList
-	Leader      bool
-	Participant bool
+	Id      int
+	Address string
+	List    NodeList
+	Leader  int
 }
 
 type LeaderStatus struct {
