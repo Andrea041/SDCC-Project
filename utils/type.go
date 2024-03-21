@@ -21,11 +21,6 @@ type NodeINFO struct {
 	Leader  int
 }
 
-type LeaderStatus struct {
-	NewLeaderID int
-	OldLeaderID int
-}
-
 type Message struct {
 	SkipCount int
 	MexID     int

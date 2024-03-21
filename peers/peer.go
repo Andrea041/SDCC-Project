@@ -35,18 +35,20 @@ func (NodeListUpdate) ElectionMessageBULLY(nodeCaller utils.NodeINFO, rep *strin
 	fmt.Printf("Election message from peer with id: %d\n", nodeCaller.Id)
 	*rep = "OK"
 
-	go algorithm.Bully(currentNode)
+	go algorithm.ElectionBully(currentNode)
 
 	return nil
 }
 
-/*func (NodeListUpdate) NewLeader(leaderINFO utils.LeaderStatus, _ *utils.NodeINFO) error {
+func (NodeListUpdate) NewLeader(leaderNode utils.NodeINFO, _ *utils.NodeINFO) error {
+	currentNode.Leader = leaderNode.Id
 
-
-	fmt.Printf("List updated: %s\n", currentNode.List.GetAllNodes())
+	for _, node := range leaderNode.List.GetAllNodes() {
+		currentNode.List.UpdateNode(node, leaderNode.Id)
+	}
 
 	return nil
-}*/
+}
 
 func (NodeListUpdate) NewLeaderCR(mex utils.Message, _ *utils.NodeINFO) error {
 	nextNode := (mex.CurrNode.Id + mex.SkipCount) % len(currentNode.List.Nodes)
@@ -55,6 +57,10 @@ func (NodeListUpdate) NewLeaderCR(mex utils.Message, _ *utils.NodeINFO) error {
 		currentNode.Leader = mex.MexID
 	} else {
 		return nil
+	}
+
+	for _, node := range currentNode.List.GetAllNodes() {
+		currentNode.List.UpdateNode(node, mex.MexID)
 	}
 
 	go algorithm.WinnerMessage(currentNode.List.GetNode(nextNode), mex.MexID)
@@ -115,6 +121,30 @@ func (NodeListUpdate) ElectionMessageCR(mex utils.Message, _ *int) error {
 	return nil
 }
 
+func chooseAlgorithm() {
+	// Algorithm
+	fmt.Println("--- Choose algorithm ---")
+	fmt.Println("1 - Bully")
+	fmt.Println("2 - Chang & Robert")
+
+	choose := utils.KeyboardInput()
+
+	switch choose {
+	case "1":
+		go algorithm.Bully(currentNode)
+	case "2":
+		go algorithm.ChangAndRobert(currentNode)
+	default:
+		fmt.Println("Invalid input")
+	}
+}
+
+func printLeader() {
+	for {
+		fmt.Printf("Il leader è: %d\n", currentNode.Leader)
+	}
+}
+
 func main() {
 	address, err := utils.GetAddress()
 	if err != nil {
@@ -164,34 +194,11 @@ func main() {
 	currentNode.Address = address
 
 	go chooseAlgorithm()
-	// go printLeader() // active for testing new leader
+	go printLeader() // active for testing new leader
+
 	/* Listen for RPC */
 	for {
 		conn, _ := list.Accept()
 		go peer.ServeConn(conn)
-	}
-}
-
-func chooseAlgorithm() {
-	// Algorithm
-	fmt.Println("--- Choose algorithm ---")
-	fmt.Println("1 - Bully")
-	fmt.Println("2 - Chang & Robert")
-
-	choose := utils.KeyboardInput()
-
-	switch choose {
-	case "1":
-		go algorithm.Bully(currentNode)
-	case "2":
-		go algorithm.ChangAndRobert(currentNode)
-	default:
-		fmt.Println("Invalid input")
-	}
-}
-
-func printLeader() {
-	for {
-		fmt.Printf("Il leader è: %d\n", currentNode.Leader)
 	}
 }
