@@ -126,6 +126,5 @@ func ChangAndRobert(currNode utils.NodeINFO) {
 	if err != nil {
 		log.Fatalf("Errore durante l'aggiornamento del nodo: %v\n", err)
 	}
-
-	return
+	fmt.Println("Connection closed")
 }

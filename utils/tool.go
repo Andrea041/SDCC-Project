@@ -1,27 +1,14 @@
 package utils
 
 import (
-	"bufio"
 	"crypto/rand"
 	"encoding/json"
 	"fmt"
-	"log"
 	"math/big"
 	"net"
 	"os"
 	"strconv"
 )
-
-func KeyboardInput() string {
-	var scanner *bufio.Scanner
-
-	scanner = bufio.NewScanner(os.Stdin)
-	scanner.Scan()
-	if err := scanner.Err(); err != nil {
-		log.Fatal("Errore nell'acquisizione dell'input: ", err)
-	}
-	return scanner.Text()
-}
 
 func GetAddress() (string, error) {
 	addrs, err := net.InterfaceAddrs()
