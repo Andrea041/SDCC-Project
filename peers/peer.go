@@ -23,10 +23,6 @@ func (NodeListUpdate) UpdateList(node utils.Node, _ *utils.NodeINFO) error {
 
 	fmt.Printf("New peer in system, list updated\n")
 
-	/* Choose algorithm */
-	//go algorithm.ElectionBully(currentNode)
-	//go algorithm.ElectionChangRobert(currentNode, currentNode.Id)
-
 	return nil
 }
 
