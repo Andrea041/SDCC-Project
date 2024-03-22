@@ -26,3 +26,12 @@ type Message struct {
 	MexID     int
 	CurrNode  NodeINFO
 }
+
+type ServiceRegistry struct {
+	Address string `json:"address"`
+	Port    string `json:"port"`
+}
+
+type Configuration struct {
+	ServiceRegistry ServiceRegistry `json:"service_registry"`
+}

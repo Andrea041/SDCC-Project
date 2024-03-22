@@ -167,8 +167,15 @@ func main() {
 
 	/* Register peer's service on Service Registry */
 	// TODO: implementare successivamente con un file di configurazione il reperimento dell'indirizzo del service registry che per assuzione è noto, segnare nel report!!
-	serviceReg := "localhost:" + "8888"
-	server, err := rpc.Dial("tcp", serviceReg)
+
+	// Lettura del file di configurazione
+	config, err := utils.ReadConfig("configuration.json")
+	if err != nil {
+		log.Fatal("Errore durante la lettura del file di configurazione:", err)
+	}
+
+	serviceAddress := config.ServiceRegistry.Address + config.ServiceRegistry.Port
+	server, err := rpc.Dial("tcp", serviceAddress)
 	if err != nil {
 		log.Fatal("Connection error: ", err)
 	}

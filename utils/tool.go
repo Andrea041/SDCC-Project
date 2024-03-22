@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net"
@@ -55,4 +56,19 @@ func GetAddress() (string, error) {
 	addr := listener.Addr().(*net.TCPAddr)
 
 	return ip + ":" + strconv.Itoa(addr.Port), nil
+}
+
+func ReadConfig(file string) (Configuration, error) {
+	var config Configuration
+
+	tmp, err := os.ReadFile(file)
+	if err != nil {
+		return Configuration{}, err
+	}
+
+	err = json.Unmarshal(tmp, &config)
+	if err != nil {
+		return Configuration{}, err
+	}
+	return config, nil
 }
