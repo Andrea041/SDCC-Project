@@ -135,7 +135,6 @@ func stopNode() {
 
 	for {
 		randNum := utils.Random(minNum, maxNum)
-
 		if currentNode.Id == randNum {
 			os.Exit(1)
 		}
