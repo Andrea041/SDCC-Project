@@ -3,11 +3,11 @@ package main
 import (
 	"SDCCproject/algorithm"
 	"SDCCproject/utils"
-
 	"fmt"
 	"log"
 	"net"
 	"net/rpc"
+	"os"
 )
 
 // Global variable to hold peers in DS
@@ -21,6 +21,10 @@ func (NodeListUpdate) UpdateList(node utils.Node, _ *utils.NodeINFO) error {
 	currentNode.List.AddNode(node)
 
 	fmt.Printf("New peer in system, list updated\n")
+
+	/* Choose algorithm */
+	//go algorithm.ElectionBully(currentNode)
+	//go algorithm.ElectionChangRobert(currentNode, currentNode.Id)
 
 	return nil
 }
@@ -78,21 +82,20 @@ func (NodeListUpdate) ElectionMessageCR(mex utils.Message, _ *int) error {
 		go algorithm.ElectionChangRobert(currentNode.List.GetNode(currID), mex.MexID)
 	} else if mex.MexID == currID {
 		info := utils.Message{
-			SkipCount: 0,
+			SkipCount: 1,
 			MexID:     mex.MexID,
 			CurrNode:  currentNode.List.GetNode(currID),
 		}
 
-		node := currentNode.List.GetNode(currID)
-		node.Leader = currID
+		currentNode.Leader = mex.MexID
 
 		peer, err := rpc.Dial("tcp", currentNode.List.GetNode((currentNode.Id+1)%len(currentNode.List.Nodes)).Address)
 		if err != nil {
 			skip := (currentNode.Id + 1) % len(currentNode.List.Nodes)
-			i := skip
+			i := 1
 			for {
 				i++
-				pass := i % len(currentNode.List.Nodes)
+				pass := (currentNode.Id + i) % len(currentNode.List.Nodes)
 				if pass == skip-1 {
 					return nil
 				}
@@ -122,20 +125,23 @@ func (NodeListUpdate) ElectionMessageCR(mex utils.Message, _ *int) error {
 }
 
 func chooseAlgorithm() {
-	// Algorithm
-	fmt.Println("--- Choose algorithm ---")
-	fmt.Println("1 - Bully")
-	fmt.Println("2 - Chang & Robert")
+	for {
+		/* Choose algorithm */
+		//algorithm.Bully(currentNode)
+		algorithm.ChangAndRobert(currentNode)
+	}
+}
 
-	choose := utils.KeyboardInput()
+func stopNode() {
+	minNum := 0
+	maxNum := 100000000
 
-	switch choose {
-	case "1":
-		go algorithm.Bully(currentNode)
-	case "2":
-		go algorithm.ChangAndRobert(currentNode)
-	default:
-		fmt.Println("Invalid input")
+	for {
+		randNum := utils.Random(minNum, maxNum)
+
+		if currentNode.Id == randNum {
+			os.Exit(1)
+		}
 	}
 }
 
@@ -166,10 +172,10 @@ func main() {
 	}
 
 	/* Register peer's service on Service Registry */
-	// TODO: implementare successivamente con un file di configurazione il reperimento dell'indirizzo del service registry che per assuzione è noto, segnare nel report!!
+	// TODO: Indirizzo del service registry che per assuzione è noto, segnare nel report!!
 
-	// Lettura del file di configurazione
-	config, err := utils.ReadConfig("configuration.json")
+	// Reading configuration file
+	config, err := utils.ReadConfig("/Users/andreaandreoli/Desktop/projectSDCC/config.json")
 	if err != nil {
 		log.Fatal("Errore durante la lettura del file di configurazione:", err)
 	}
@@ -177,7 +183,7 @@ func main() {
 	serviceAddress := config.ServiceRegistry.Address + config.ServiceRegistry.Port
 	server, err := rpc.Dial("tcp", serviceAddress)
 	if err != nil {
-		log.Fatal("Connection error: ", err)
+		log.Fatal("Connection error SR: ", err)
 	}
 
 	defer func(server *rpc.Client) {
@@ -200,8 +206,9 @@ func main() {
 	currentNode = peerRep
 	currentNode.Address = address
 
+	go stopNode()
 	go chooseAlgorithm()
-	// go printLeader() // active for testing new leader
+	go printLeader() // active for testing new leader
 
 	/* Listen for RPC */
 	for {

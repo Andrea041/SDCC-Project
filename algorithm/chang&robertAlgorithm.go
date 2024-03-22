@@ -18,10 +18,10 @@ func WinnerMessage(currentNode utils.NodeINFO, leader int) {
 	peer, err := rpc.Dial("tcp", currentNode.List.GetNode((currentNode.Id+1)%len(currentNode.List.Nodes)).Address)
 	if err != nil {
 		skip := (currentNode.Id + 1) % len(currentNode.List.Nodes)
-		i := skip
+		i := 0
 		for {
 			i++
-			pass := i % len(currentNode.List.Nodes)
+			pass := (currentNode.Id + i) % len(currentNode.List.Nodes)
 			if pass == skip-1 {
 				return
 			}
@@ -50,20 +50,29 @@ func WinnerMessage(currentNode utils.NodeINFO, leader int) {
 func ElectionChangRobert(currentNode utils.NodeINFO, mexReply int) {
 	var info utils.Message
 
-	if mexReply == 0 {
-		info = utils.Message{SkipCount: 1, MexID: currentNode.Id, CurrNode: currentNode}
-	} else {
-		info = utils.Message{SkipCount: 1, MexID: mexReply, CurrNode: currentNode}
-	}
+	info = utils.Message{SkipCount: 1, MexID: mexReply, CurrNode: currentNode}
 
 	peer, err := rpc.Dial("tcp", currentNode.List.GetNode((currentNode.Id+1)%len(currentNode.List.Nodes)).Address)
 	if err != nil {
 		skip := (currentNode.Id + 1) % len(currentNode.List.Nodes)
-		i := skip
+		i := 0
 		for {
 			i++
-			pass := i % len(currentNode.List.Nodes)
+			pass := (currentNode.Id + i) % len(currentNode.List.Nodes)
 			if pass == skip-1 {
+				info.MexID = currentNode.Id
+				peer, err = rpc.Dial("tcp", currentNode.List.GetNode(currentNode.Id).Address)
+
+				err = peer.Call("NodeListUpdate.NewLeaderCR", info, nil)
+				if err != nil {
+					log.Printf("Errore durante l'aggiornamento del nodo: %v", err)
+				}
+
+				err = peer.Close()
+				if err != nil {
+					log.Fatalf("Errore durante l'aggiornamento del nodo: %v\n", err)
+				}
+
 				return
 			}
 
@@ -89,10 +98,22 @@ func ElectionChangRobert(currentNode utils.NodeINFO, mexReply int) {
 }
 
 func ChangAndRobert(currNode utils.NodeINFO) {
+	if len(currNode.List.GetAllNodes()) == 1 {
+		return
+	}
+
+	if currNode.Id == currNode.List.GetNode(currNode.Leader).Leader {
+		return
+	}
+
+	if currNode.Id > currNode.Leader {
+		ElectionChangRobert(currNode, currNode.Id)
+	}
+
 	peer, err := rpc.Dial("tcp", currNode.List.GetNode(currNode.Leader).Address)
 	if err != nil {
 		fmt.Println("--- Start new election ---")
-		ElectionChangRobert(currNode, 0)
+		ElectionChangRobert(currNode, currNode.Id)
 		return
 	}
 

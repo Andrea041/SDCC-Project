@@ -40,7 +40,6 @@ func (NodeHandler) ManageNode(peerAddress utils.PeerAddr, nodeInfo *utils.NodeIN
 	for _, node := range nodes {
 		peer, err := rpc.Dial("tcp", node.Address)
 		if err != nil {
-			log.Printf("Errore di connessione: %v", err)
 			continue
 		}
 
@@ -67,14 +66,19 @@ func main() {
 		log.Fatal("Il formato del servizio è errato: ", err)
 	}
 
-	// TODO: mettere l'indirizzo di porta del service registry in un file di configurazione
 	// TODO: Scrivere nel report finale che tra le ipotesi dell'algoritmo si ha comunicazione affidabile quindi uso TCP come protocollo di comunicazione
-	list, err := net.Listen("tcp", "localhost:8888")
+	config, err := utils.ReadConfig("/Users/andreaandreoli/Desktop/projectSDCC/config.json")
+	if err != nil {
+		log.Fatal("Errore durante la lettura del file di configurazione:", err)
+	}
+
+	serviceAddress := config.ServiceRegistry.Address + config.ServiceRegistry.Port
+	list, err := net.Listen("tcp", serviceAddress)
 	if err != nil {
 		log.Fatal("Errore nell'instaurazione della connessione: ", err)
 	}
 
-	log.Printf("Il Service Registry si trova in ascolto sulla porta %d", 8888)
+	log.Printf("Il Service Registry si trova in ascolto sulla porta %s", config.ServiceRegistry.Port)
 
 	for {
 		conn, _ := list.Accept()

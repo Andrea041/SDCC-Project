@@ -2,7 +2,6 @@ package algorithm
 
 import (
 	"SDCCproject/utils"
-
 	"fmt"
 	"log"
 	"net/rpc"
@@ -54,6 +53,19 @@ func ElectionBully(currNode utils.NodeINFO) {
 }
 
 func Bully(currNode utils.NodeINFO) {
+	if len(currNode.List.GetAllNodes()) == 1 {
+		return
+	}
+
+	if currNode.Id == currNode.List.GetNode(currNode.Leader).Leader {
+		return
+	}
+
+	if currNode.Id > currNode.Leader {
+		ElectionBully(currNode)
+	}
+
+	/* Ping leader process */
 	peer, err := rpc.Dial("tcp", currNode.List.GetNode(currNode.Leader).Address)
 	if err != nil {
 		fmt.Println("--- Start new election ---")
@@ -70,6 +82,5 @@ func Bully(currNode utils.NodeINFO) {
 	if err != nil {
 		log.Fatalf("Errore durante l'aggiornamento del nodo: %v\n", err)
 	}
-
-	return
+	fmt.Println("Connection closed")
 }
