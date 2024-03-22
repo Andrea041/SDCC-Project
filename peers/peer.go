@@ -25,8 +25,8 @@ func (NodeListUpdate) UpdateList(node utils.Node, _ *utils.NodeINFO) error {
 	return nil
 }
 
-func (NodeListUpdate) CheckLeaderStatus(node utils.Node, _ *utils.NodeINFO) error {
-	fmt.Printf("Hi i'm the peer with address: %s, with id: %d\n", node.Address, node.Id)
+func (NodeListUpdate) CheckLeaderStatus(_ utils.Node, _ *utils.NodeINFO) error {
+	fmt.Printf("Hi i'm the leader peer with address: %s, and id: %d. I'm still active!\n", currentNode.Address, currentNode.Id)
 
 	return nil
 }
@@ -194,7 +194,7 @@ func main() {
 	currentNode.Address = address
 
 	go chooseAlgorithm()
-	go printLeader() // active for testing new leader
+	// go printLeader() // active for testing new leader
 
 	/* Listen for RPC */
 	for {
