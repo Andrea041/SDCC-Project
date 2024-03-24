@@ -21,19 +21,19 @@ func (PeerServiceHandler) UpdateList(node utils.Node, _ *utils.NodeINFO) error {
 	currentNode.List.GetAllNodes()
 	currentNode.List.AddNode(node)
 
-	fmt.Printf("New peer in system, list updated\n")
+	fmt.Printf("New DockerfilePeer in system, list updated\n")
 
 	return nil
 }
 
 func (PeerServiceHandler) CheckLeaderStatus(_ utils.Node, _ *utils.NodeINFO) error {
-	fmt.Printf("Hi i'm the leader peer with address: %s, and id: %d. I'm still active!\n", currentNode.Address, currentNode.Id)
+	fmt.Printf("Hi i'm the leader DockerfilePeer with address: %s, and id: %d. I'm still active!\n", currentNode.Address, currentNode.Id)
 
 	return nil
 }
 
 func (PeerServiceHandler) ElectionMessageBULLY(nodeCaller utils.NodeINFO, rep *string) error {
-	fmt.Printf("Election message from peer with id: %d\n", nodeCaller.Id)
+	fmt.Printf("Election message from DockerfilePeer with id: %d\n", nodeCaller.Id)
 	*rep = "OK"
 
 	go algorithm.ElectionBully(currentNode)
@@ -153,7 +153,7 @@ func main() {
 		fmt.Println("IP retrieving error: ", err)
 	}
 
-	/* Init peer's service */
+	/* Init DockerfilePeer's service */
 	peerService := new(PeerServiceHandler)
 
 	peer := rpc.NewServer()
@@ -167,7 +167,7 @@ func main() {
 		log.Fatal("Connection error: ", err)
 	}
 
-	/* Register peer's service on Service Registry */
+	/* Register DockerfilePeer's service on Service Registry */
 	// Reading configuration file
 	config, err := utils.ReadConfig("/Users/andreaandreoli/Desktop/projectSDCC/config.json")
 	if err != nil {

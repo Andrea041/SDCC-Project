@@ -11,10 +11,10 @@ import (
 // NodeHandler is the interface which exposes the RPC method ManageNode
 type NodeHandler struct{}
 
-// Global variable to hold peer in DS
+// Global variable to hold DockerfilePeer in DS
 var nodeList utils.NodeList
 
-// ManageNode is the discovery service for each new peer in DS
+// ManageNode is the discovery service for each new DockerfilePeer in DS
 func (NodeHandler) ManageNode(peerAddress utils.PeerAddr, nodeInfo *utils.NodeINFO) error {
 	nodes := nodeList.GetAllNodes()
 
@@ -33,7 +33,7 @@ func (NodeHandler) ManageNode(peerAddress utils.PeerAddr, nodeInfo *utils.NodeIN
 	// Add new node to local list
 	nodeList.AddNode(newNode)
 
-	// Send peer's info
+	// Send DockerfilePeer's info
 	nodeInfo.Id = newID
 	nodeInfo.List.Nodes = nodeList.GetAllNodes()
 	nodeInfo.Leader = newNode.Leader
