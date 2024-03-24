@@ -44,14 +44,14 @@ func (NodeHandler) ManageNode(peerAddress utils.PeerAddr, nodeInfo *utils.NodeIN
 			continue
 		}
 
-		err = peer.Call("NodeListUpdate.UpdateList", newNode, nil)
+		err = peer.Call("PeerServiceHandler.UpdateList", newNode, nil)
 		if err != nil {
-			log.Printf("Errore durante l'aggiornamento del nodo: %v", err)
+			log.Fatal("List update failed: ", err)
 		}
 
 		err = peer.Close()
 		if err != nil {
-			log.Fatalf("Errore durante l'aggiornamento del nodo: %v\n", err)
+			log.Fatal("Closing connection error: ", err)
 		}
 	}
 
@@ -64,22 +64,22 @@ func main() {
 	server := rpc.NewServer()
 	err := server.Register(serviceRegistry)
 	if err != nil {
-		log.Fatal("Il formato del servizio è errato: ", err)
+		log.Fatal("Wrong service format: ", err)
 	}
 
 	// TODO: Scrivere nel report finale che tra le ipotesi dell'algoritmo si ha comunicazione affidabile quindi uso TCP come protocollo di comunicazione
 	config, err := utils.ReadConfig("/Users/andreaandreoli/Desktop/projectSDCC/config.json")
 	if err != nil {
-		log.Fatal("Errore durante la lettura del file di configurazione:", err)
+		log.Fatal("Configuration file reading error: ", err)
 	}
 
 	serviceAddress := config.ServiceRegistry.Address + config.ServiceRegistry.Port
 	list, err := net.Listen("tcp", serviceAddress)
 	if err != nil {
-		log.Fatal("Errore nell'instaurazione della connessione: ", err)
+		log.Fatal("Connection error: ", err)
 	}
 
-	log.Printf("Il Service Registry si trova in ascolto sulla porta %s", config.ServiceRegistry.Port)
+	log.Printf("Service registry listening on port %s", config.ServiceRegistry.Port)
 
 	for {
 		conn, _ := list.Accept()

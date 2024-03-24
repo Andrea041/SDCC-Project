@@ -14,10 +14,10 @@ import (
 // Global variable to hold peers in DS
 var currentNode utils.NodeINFO
 
-// NodeListUpdate is the interface which exposes the RPC method ManageNode
-type NodeListUpdate struct{}
+// PeerServiceHandler is the interface which exposes the RPC method ManageNode
+type PeerServiceHandler struct{}
 
-func (NodeListUpdate) UpdateList(node utils.Node, _ *utils.NodeINFO) error {
+func (PeerServiceHandler) UpdateList(node utils.Node, _ *utils.NodeINFO) error {
 	currentNode.List.GetAllNodes()
 	currentNode.List.AddNode(node)
 
@@ -26,13 +26,13 @@ func (NodeListUpdate) UpdateList(node utils.Node, _ *utils.NodeINFO) error {
 	return nil
 }
 
-func (NodeListUpdate) CheckLeaderStatus(_ utils.Node, _ *utils.NodeINFO) error {
+func (PeerServiceHandler) CheckLeaderStatus(_ utils.Node, _ *utils.NodeINFO) error {
 	fmt.Printf("Hi i'm the leader peer with address: %s, and id: %d. I'm still active!\n", currentNode.Address, currentNode.Id)
 
 	return nil
 }
 
-func (NodeListUpdate) ElectionMessageBULLY(nodeCaller utils.NodeINFO, rep *string) error {
+func (PeerServiceHandler) ElectionMessageBULLY(nodeCaller utils.NodeINFO, rep *string) error {
 	fmt.Printf("Election message from peer with id: %d\n", nodeCaller.Id)
 	*rep = "OK"
 
@@ -41,7 +41,7 @@ func (NodeListUpdate) ElectionMessageBULLY(nodeCaller utils.NodeINFO, rep *strin
 	return nil
 }
 
-func (NodeListUpdate) NewLeader(leaderNode utils.NodeINFO, _ *utils.NodeINFO) error {
+func (PeerServiceHandler) NewLeader(leaderNode utils.NodeINFO, _ *utils.NodeINFO) error {
 	currentNode.Leader = leaderNode.Id
 
 	for _, node := range leaderNode.List.GetAllNodes() {
@@ -51,7 +51,7 @@ func (NodeListUpdate) NewLeader(leaderNode utils.NodeINFO, _ *utils.NodeINFO) er
 	return nil
 }
 
-func (NodeListUpdate) NewLeaderCR(mex utils.Message, _ *utils.NodeINFO) error {
+func (PeerServiceHandler) NewLeaderCR(mex utils.Message, _ *utils.NodeINFO) error {
 	nextNode := (mex.CurrNode.Id + mex.SkipCount) % len(currentNode.List.Nodes)
 
 	if currentNode.Leader != mex.MexID {
@@ -69,7 +69,7 @@ func (NodeListUpdate) NewLeaderCR(mex utils.Message, _ *utils.NodeINFO) error {
 	return nil
 }
 
-func (NodeListUpdate) ElectionMessageCR(mex utils.Message, _ *int) error {
+func (PeerServiceHandler) ElectionMessageCR(mex utils.Message, _ *int) error {
 	currID := (mex.CurrNode.Id + mex.SkipCount) % len(currentNode.List.Nodes)
 
 	if mex.MexID > currID {
@@ -107,14 +107,14 @@ func (NodeListUpdate) ElectionMessageCR(mex utils.Message, _ *int) error {
 			}
 		}
 
-		err = peer.Call("NodeListUpdate.NewLeaderCR", info, nil)
+		err = peer.Call("PeerServiceHandler.NewLeaderCR", info, nil)
 		if err != nil {
-			log.Printf("Errore durante l'aggiornamento del nodo: %v", err)
+			log.Printf("New leader update error: %v", err)
 		}
 
 		err = peer.Close()
 		if err != nil {
-			log.Fatalf("Errore durante l'aggiornamento del nodo: %v\n", err)
+			log.Fatalf("Closing connection error: %v\n", err)
 		}
 	}
 
@@ -131,7 +131,7 @@ func chooseAlgorithm() {
 
 func stopNode() {
 	minNum := 0
-	maxNum := 100000000
+	maxNum := 100000
 
 	for {
 		randNum := utils.Random(minNum, maxNum)
@@ -143,37 +143,35 @@ func stopNode() {
 
 func printLeader() {
 	for {
-		fmt.Printf("Il leader è: %d\n", currentNode.Leader)
+		fmt.Printf("Leader: %d\n", currentNode.Leader)
 	}
 }
 
 func main() {
 	address, err := utils.GetAddress()
 	if err != nil {
-		fmt.Println("Errore durante il recupero dell'indirizzo IP locale:", err)
+		fmt.Println("IP retrieving error: ", err)
 	}
 
 	/* Init peer's service */
-	peerService := new(NodeListUpdate)
+	peerService := new(PeerServiceHandler)
 
 	peer := rpc.NewServer()
 	err = peer.Register(peerService)
 	if err != nil {
-		log.Fatal("Il formato del servizio è errato: ", err)
+		log.Fatal("Wrong service format: ", err)
 	}
 
 	list, err := net.Listen("tcp", address)
 	if err != nil {
-		log.Fatal("Errore nell'instaurazione della connessione: ", err)
+		log.Fatal("Connection error: ", err)
 	}
 
 	/* Register peer's service on Service Registry */
-	// TODO: Indirizzo del service registry che per assuzione è noto, segnare nel report!!
-
 	// Reading configuration file
 	config, err := utils.ReadConfig("/Users/andreaandreoli/Desktop/projectSDCC/config.json")
 	if err != nil {
-		log.Fatal("Errore durante la lettura del file di configurazione:", err)
+		log.Fatal("Configuration file reading error: ", err)
 	}
 
 	serviceAddress := config.ServiceRegistry.Address + config.ServiceRegistry.Port
@@ -185,7 +183,7 @@ func main() {
 	defer func(server *rpc.Client) {
 		err := server.Close()
 		if err != nil {
-			log.Fatal("Il formato del servizio è errato: ", err)
+			log.Fatal("Closing connection error: ", err)
 		}
 	}(server)
 
@@ -204,7 +202,7 @@ func main() {
 
 	go stopNode()
 	go chooseAlgorithm()
-	go printLeader() // active for testing new leader
+	go printLeader() // active to test new leader
 
 	/* Listen for RPC */
 	for {

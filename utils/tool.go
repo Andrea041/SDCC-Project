@@ -11,13 +11,13 @@ import (
 )
 
 func GetAddress() (string, error) {
-	addrs, err := net.InterfaceAddrs()
+	interfaceAddr, err := net.InterfaceAddrs()
 	if err != nil {
 		return "", err
 	}
 
 	var ip string
-	for _, addr := range addrs {
+	for _, addr := range interfaceAddr {
 		if ipNet, ok := addr.(*net.IPNet); ok && !ipNet.IP.IsLoopback() && ipNet.IP.To4() != nil {
 			ip = ipNet.IP.String()
 			break
@@ -25,13 +25,12 @@ func GetAddress() (string, error) {
 	}
 
 	if ip == "" {
-		return "", fmt.Errorf("indirizzo IP locale non trovato")
+		return "", fmt.Errorf("local IP address not found")
 	}
 
-	// Ottieni una porta disponibile
 	listener, err := net.Listen("tcp", ":0")
 	if err != nil {
-		return "", fmt.Errorf("impossibile ottenere una porta disponibile: %v", err)
+		return "", fmt.Errorf("available port not found: %v", err)
 	}
 
 	defer func(listener net.Listener) {
@@ -41,7 +40,6 @@ func GetAddress() (string, error) {
 		}
 	}(listener)
 
-	// Ottieni l'indirizzo e la porta dell'ascoltatore
 	addr := listener.Addr().(*net.TCPAddr)
 
 	return ip + ":" + strconv.Itoa(addr.Port), nil

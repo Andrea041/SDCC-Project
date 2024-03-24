@@ -3,7 +3,7 @@ package utils
 type Node struct {
 	Id      int
 	Address string
-	Leader  int // contiene l'ID del leader
+	Leader  int
 }
 
 type PeerAddr struct {

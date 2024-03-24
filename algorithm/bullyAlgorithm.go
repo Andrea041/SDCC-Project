@@ -17,17 +17,15 @@ func ElectionBully(currNode utils.NodeINFO) {
 			}
 
 			var repOK string
-			err = peer.Call("NodeListUpdate.ElectionMessageBULLY", currNode, &repOK)
+			err = peer.Call("PeerServiceHandler.ElectionMessageBULLY", currNode, &repOK)
 			if err != nil {
-				log.Printf("Errore durante l'aggiornamento del nodo: %v", err)
+				log.Fatal("Election message forward failed: ", err)
 			}
 
 			if repOK != "" {
-				fmt.Println("OK message replied")
-
 				err = peer.Close()
 				if err != nil {
-					log.Fatalf("Errore durante l'aggiornamento del nodo: %v\n", err)
+					log.Fatal("Closing connection error: ", err)
 				}
 
 				return
@@ -41,14 +39,14 @@ func ElectionBully(currNode utils.NodeINFO) {
 			continue
 		}
 
-		err = peer.Call("NodeListUpdate.NewLeader", currNode.List.GetNode(currNode.Id), nil)
+		err = peer.Call("PeerServiceHandler.NewLeader", currNode.List.GetNode(currNode.Id), nil)
 		if err != nil {
-			log.Printf("Errore durante l'aggiornamento del nodo: %v", err)
+			log.Fatal("Leader update error: ", err)
 		}
 
 		err = peer.Close()
 		if err != nil {
-			log.Fatalf("Errore durante l'aggiornamento del nodo: %v\n", err)
+			log.Fatal("Closing connection error: ", err)
 		}
 	}
 }
@@ -74,14 +72,14 @@ func Bully(currNode utils.NodeINFO) {
 		return
 	}
 
-	err = peer.Call("NodeListUpdate.CheckLeaderStatus", currNode.List.GetNode(currNode.Leader), nil)
+	err = peer.Call("PeerServiceHandler.CheckLeaderStatus", currNode.List.GetNode(currNode.Leader), nil)
 	if err != nil {
-		log.Printf("Errore durante l'aggiornamento del nodo: %v", err)
+		log.Printf("Ping to leader failed: %v\n", err)
 	}
 
 	err = peer.Close()
 	if err != nil {
-		log.Fatalf("Errore durante l'aggiornamento del nodo: %v\n", err)
+		log.Fatal("Closing connection error: ", err)
 	}
 	fmt.Println("Connection closed")
 }

@@ -36,14 +36,14 @@ func WinnerMessage(currentNode utils.NodeINFO, leader int) {
 		}
 	}
 
-	err = peer.Call("NodeListUpdate.NewLeaderCR", info, nil)
+	err = peer.Call("PeerServiceHandler.NewLeaderCR", info, nil)
 	if err != nil {
-		log.Printf("Errore durante l'aggiornamento del nodo: %v", err)
+		log.Fatal("Leader update error", err)
 	}
 
 	err = peer.Close()
 	if err != nil {
-		log.Fatalf("Errore durante l'aggiornamento del nodo: %v\n", err)
+		log.Fatal("Closing connection error: ", err)
 	}
 }
 
@@ -63,14 +63,14 @@ func ElectionChangRobert(currentNode utils.NodeINFO, mexReply int) {
 				info.MexID = currentNode.Id
 				peer, err = rpc.Dial("tcp", currentNode.List.GetNode(currentNode.Id).Address)
 
-				err = peer.Call("NodeListUpdate.NewLeaderCR", info, nil)
+				err = peer.Call("PeerServiceHandler.NewLeaderCR", info, nil)
 				if err != nil {
-					log.Printf("Errore durante l'aggiornamento del nodo: %v", err)
+					log.Printf("Leader update error: %v", err)
 				}
 
 				err = peer.Close()
 				if err != nil {
-					log.Fatalf("Errore durante l'aggiornamento del nodo: %v\n", err)
+					log.Fatal("Closing connection error: ", err)
 				}
 
 				return
@@ -86,14 +86,14 @@ func ElectionChangRobert(currentNode utils.NodeINFO, mexReply int) {
 		}
 	}
 
-	err = peer.Call("NodeListUpdate.ElectionMessageCR", info, nil)
+	err = peer.Call("PeerServiceHandler.ElectionMessageCR", info, nil)
 	if err != nil {
-		log.Printf("Errore durante l'aggiornamento del nodo: %v", err)
+		log.Fatal("Election message forward failed: ", err)
 	}
 
 	err = peer.Close()
 	if err != nil {
-		log.Fatalf("Errore durante l'aggiornamento del nodo: %v\n", err)
+		log.Fatal("Closing connection error: ", err)
 	}
 }
 
@@ -117,14 +117,14 @@ func ChangAndRobert(currNode utils.NodeINFO) {
 		return
 	}
 
-	err = peer.Call("NodeListUpdate.CheckLeaderStatus", currNode.List.GetNode(currNode.Leader), nil)
+	err = peer.Call("PeerServiceHandler.CheckLeaderStatus", currNode.List.GetNode(currNode.Leader), nil)
 	if err != nil {
-		log.Printf("Errore durante l'aggiornamento del nodo: %v", err)
+		log.Printf("Ping to leader failed: %v\n", err)
 	}
 
 	err = peer.Close()
 	if err != nil {
-		log.Fatalf("Errore durante l'aggiornamento del nodo: %v\n", err)
+		log.Fatal("Closing connection error: ", err)
 	}
 	fmt.Println("Connection closed")
 }
