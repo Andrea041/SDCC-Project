@@ -15,7 +15,7 @@ COPY config.json /app
 RUN apt-get update && apt-get install -y golang-go
 
 # Esponi la porta 3000 del contenitore
-EXPOSE 3000
+EXPOSE 3000:3100
 
 # Definisci il comando per avviare l'applicazione quando il contenitore viene eseguito
 CMD ["sh", "-c", "cd peers && go run ."]
