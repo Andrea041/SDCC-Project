@@ -68,7 +68,7 @@ func main() {
 	}
 
 	// TODO: Scrivere nel report finale che tra le ipotesi dell'algoritmo si ha comunicazione affidabile quindi uso TCP come protocollo di comunicazione
-	config, err := utils.ReadConfig("/Users/andreaandreoli/Desktop/projectSDCC/config.json")
+	config, err := utils.ReadConfig("/app/config.json")
 	if err != nil {
 		log.Fatal("Configuration file reading error: ", err)
 	}

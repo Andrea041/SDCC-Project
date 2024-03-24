@@ -168,8 +168,7 @@ func main() {
 	}
 
 	/* Register DockerfilePeer's service on Service Registry */
-	// Reading configuration file
-	config, err := utils.ReadConfig("/Users/andreaandreoli/Desktop/projectSDCC/config.json")
+	config, err := utils.ReadConfig("/app/config.json")
 	if err != nil {
 		log.Fatal("Configuration file reading error: ", err)
 	}

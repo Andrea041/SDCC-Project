@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  service_registry:
+    build:
+      context: .
+      dockerfile: DockerfileServiceRegistry
+
+  peer:
+    build:
+      context: .
+      dockerfile: DockerfilePeer
+    depends_on:
+      - service_registry
+    links:
+      - service_registry
+    deploy:
+      replicas: 5
+

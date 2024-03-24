@@ -9,6 +9,7 @@ COPY peers /app/peers
 COPY go.mod /app
 COPY utils /app/utils
 COPY algorithm /app/algorithm
+COPY config.json /app
 
 # Aggiorna l'indice dei pacchetti e installa le dipendenze necessarie
 RUN apt-get update && apt-get install -y golang-go
