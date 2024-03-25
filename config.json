@@ -1,6 +1,6 @@
 {
   "service_registry": {
-    "address": "localhost",
+    "address": "my-registry",
     "port": ":8888"
   }
 }

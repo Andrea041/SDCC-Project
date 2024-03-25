@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: DockerfileServiceRegistry
+    hostname: my-registry
 
   peer:
     build:
