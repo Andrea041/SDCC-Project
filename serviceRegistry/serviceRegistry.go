@@ -2,6 +2,7 @@ package main
 
 import (
 	"SDCCproject/utils"
+	"fmt"
 
 	"log"
 	"net"
@@ -17,6 +18,7 @@ var nodeList utils.NodeList
 // ManageNode is the discovery service for each new DockerfilePeer in DS
 func (NodeHandler) ManageNode(peerAddress utils.PeerAddr, nodeInfo *utils.NodeINFO) error {
 	nodes := nodeList.GetAllNodes()
+	fmt.Printf("NewPeerNode: %s\n", peerAddress.PeerAddress)
 
 	// Find max ID
 	maxID := -1
@@ -77,8 +79,8 @@ func main() {
 	}
 
 	// TODO: Scrivere nel report finale che tra le ipotesi dell'algoritmo si ha comunicazione affidabile quindi uso TCP come protocollo di comunicazione
-	//config, err := utils.ReadConfig("/app/config.json")
-	config, err := utils.ReadConfig("/Users/andreaandreoli/Desktop/projectSDCC/config.json")
+	config, err := utils.ReadConfig("/app/config.json")
+	//config, err := utils.ReadConfig("/Users/andreaandreoli/Desktop/projectSDCC/config.json")
 	if err != nil {
 		log.Fatal("Configuration file reading error: ", err)
 	}

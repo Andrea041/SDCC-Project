@@ -82,5 +82,4 @@ func Bully(currNode utils.NodeINFO) {
 	if err != nil {
 		log.Fatal("Closing connection error: ", err)
 	}
-	fmt.Println("Connection closed")
 }

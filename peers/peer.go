@@ -27,7 +27,7 @@ func (PeerServiceHandler) UpdateList(node utils.Node, _ *utils.NodeINFO) error {
 }
 
 func (PeerServiceHandler) CheckLeaderStatus(_ utils.Node, _ *utils.NodeINFO) error {
-	//fmt.Printf("Hi i'm the leader with address: %s, and id: %d. I'm still active!\n", currentNode.Address, currentNode.Id)
+	fmt.Printf("Hi i'm the leader with address: %s, and id: %d. I'm still active!\n", currentNode.Address, currentNode.Id)
 
 	return nil
 }
@@ -125,9 +125,9 @@ func chooseAlgorithm() {
 	for {
 		/* Choose algorithm */
 		algorithm.Bully(currentNode)
+		//algorithm.ChangAndRobert(currentNode)
 		time.Sleep(time.Second)
 		fmt.Printf("Leader: %d\n", currentNode.Leader)
-		//algorithm.ChangAndRobert(currentNode)
 	}
 }
 
@@ -143,36 +143,26 @@ func stopNode() {
 	}
 }
 
-func printLeader() {
-	for {
-		time.Sleep(time.Second)
-		fmt.Printf("Leader: %d\n", currentNode.Leader)
-	}
-}
-
 func main() {
-	address, err := utils.GetAddress()
-	if err != nil {
-		fmt.Println("IP retrieving error: ", err)
-	}
-
 	/* Init DockerfilePeer's service */
 	peerService := new(PeerServiceHandler)
 
 	peer := rpc.NewServer()
-	err = peer.Register(peerService)
+	err := peer.Register(peerService)
 	if err != nil {
 		log.Fatal("Wrong service format: ", err)
 	}
 
-	list, err := net.Listen("tcp", address)
+	list, err := net.Listen("tcp", "peer:3000")
 	if err != nil {
 		log.Fatal("Connection error: ", err)
 	}
 
+	address := list.Addr().String()
+
 	/* Register DockerfilePeer's service on Service Registry */
-	//config, err := utils.ReadConfig("/app/config.json")
-	config, err := utils.ReadConfig("/Users/andreaandreoli/Desktop/projectSDCC/config.json")
+	config, err := utils.ReadConfig("/app/config.json")
+	//config, err := utils.ReadConfig("/Users/andreaandreoli/Desktop/projectSDCC/config.json")
 	if err != nil {
 		log.Fatal("Configuration file reading error: ", err)
 	}
@@ -202,9 +192,10 @@ func main() {
 	currentNode = peerRep
 	currentNode.Address = address
 
+	fmt.Printf("Your ID: %d, leader ID: %d, your address: %s, Nodes in system: %s\n", currentNode.Id, currentNode.Leader, currentNode.Address, currentNode.List.Nodes)
+
 	// go stopNode()
 	go chooseAlgorithm()
-	//go printLeader() // active to test new leader
 
 	/* Listen for RPC */
 	for {
