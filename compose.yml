@@ -6,15 +6,19 @@ services:
       context: .
       dockerfile: DockerfileServiceRegistry
     hostname: my-registry
+    ports:
+      - "8888:8888"
 
   peer:
     build:
       context: .
       dockerfile: DockerfilePeer
+    hostname: peer
+    ports:
+     - ":3000"
     depends_on:
       - service_registry
     links:
       - service_registry
     deploy:
-      replicas: 5
-
+      replicas: 3

@@ -1,20 +1,12 @@
-# Usa un'immagine base di Ubuntu
 FROM ubuntu:22.04
 
-# Imposta la directory di lavoro all'interno del contenitore
 WORKDIR /app
 
-# Copia il contenuto della directory "peers" nel contenitore
+RUN apt-get update && apt-get install -y golang-go
+
 COPY serviceRegistry /app/serviceRegistry
 COPY go.mod /app
 COPY utils /app/utils
 COPY config.json /app
 
-# Aggiorna l'indice dei pacchetti e installa le dipendenze necessarie
-RUN apt-get update && apt-get install -y golang-go
-
-# Esponi la porta 3000 del contenitore
-EXPOSE 8888
-
-# Definisci il comando per avviare l'applicazione quando il contenitore viene eseguito
 CMD ["sh", "-c", "cd serviceRegistry && go run ."]

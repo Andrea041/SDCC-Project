@@ -62,6 +62,7 @@ func Bully(currNode utils.NodeINFO) {
 
 	if currNode.Id > currNode.Leader {
 		ElectionBully(currNode)
+		return
 	}
 
 	/* Ping leader process */

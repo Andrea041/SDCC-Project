@@ -21,6 +21,15 @@ func (NodeHandler) ManageNode(peerAddress utils.PeerAddr, nodeInfo *utils.NodeIN
 	// Find max ID
 	maxID := -1
 	for _, node := range nodes {
+		// Test if the node was already in the system
+		if peerAddress.PeerAddress == node.Address {
+			nodeInfo.Id = node.Id
+			nodeInfo.List.Nodes = nodeList.GetAllNodes()
+			nodeInfo.Leader = node.Leader
+
+			return nil
+		}
+
 		if node.Id > maxID {
 			maxID = node.Id
 		}
@@ -68,7 +77,8 @@ func main() {
 	}
 
 	// TODO: Scrivere nel report finale che tra le ipotesi dell'algoritmo si ha comunicazione affidabile quindi uso TCP come protocollo di comunicazione
-	config, err := utils.ReadConfig("/app/config.json")
+	//config, err := utils.ReadConfig("/app/config.json")
+	config, err := utils.ReadConfig("/Users/andreaandreoli/Desktop/projectSDCC/config.json")
 	if err != nil {
 		log.Fatal("Configuration file reading error: ", err)
 	}

@@ -3,12 +3,12 @@ package main
 import (
 	"SDCCproject/algorithm"
 	"SDCCproject/utils"
-
 	"fmt"
 	"log"
 	"net"
 	"net/rpc"
 	"os"
+	"time"
 )
 
 // Global variable to hold peers in DS
@@ -21,13 +21,13 @@ func (PeerServiceHandler) UpdateList(node utils.Node, _ *utils.NodeINFO) error {
 	currentNode.List.GetAllNodes()
 	currentNode.List.AddNode(node)
 
-	fmt.Printf("New DockerfilePeer in system, list updated\n")
+	fmt.Printf("New peer in system, list updated\n")
 
 	return nil
 }
 
 func (PeerServiceHandler) CheckLeaderStatus(_ utils.Node, _ *utils.NodeINFO) error {
-	fmt.Printf("Hi i'm the leader DockerfilePeer with address: %s, and id: %d. I'm still active!\n", currentNode.Address, currentNode.Id)
+	//fmt.Printf("Hi i'm the leader with address: %s, and id: %d. I'm still active!\n", currentNode.Address, currentNode.Id)
 
 	return nil
 }
@@ -124,14 +124,16 @@ func (PeerServiceHandler) ElectionMessageCR(mex utils.Message, _ *int) error {
 func chooseAlgorithm() {
 	for {
 		/* Choose algorithm */
-		//algorithm.Bully(currentNode)
-		algorithm.ChangAndRobert(currentNode)
+		algorithm.Bully(currentNode)
+		time.Sleep(time.Second)
+		fmt.Printf("Leader: %d\n", currentNode.Leader)
+		//algorithm.ChangAndRobert(currentNode)
 	}
 }
 
 func stopNode() {
 	minNum := 0
-	maxNum := 100000
+	maxNum := 10000000000
 
 	for {
 		randNum := utils.Random(minNum, maxNum)
@@ -143,6 +145,7 @@ func stopNode() {
 
 func printLeader() {
 	for {
+		time.Sleep(time.Second)
 		fmt.Printf("Leader: %d\n", currentNode.Leader)
 	}
 }
@@ -168,7 +171,8 @@ func main() {
 	}
 
 	/* Register DockerfilePeer's service on Service Registry */
-	config, err := utils.ReadConfig("/app/config.json")
+	//config, err := utils.ReadConfig("/app/config.json")
+	config, err := utils.ReadConfig("/Users/andreaandreoli/Desktop/projectSDCC/config.json")
 	if err != nil {
 		log.Fatal("Configuration file reading error: ", err)
 	}
@@ -176,7 +180,7 @@ func main() {
 	serviceAddress := config.ServiceRegistry.Address + config.ServiceRegistry.Port
 	server, err := rpc.Dial("tcp", serviceAddress)
 	if err != nil {
-		log.Fatal("Connection error SR: ", err)
+		log.Fatal("Connection error to service registry: ", err)
 	}
 
 	defer func(server *rpc.Client) {
@@ -195,13 +199,12 @@ func main() {
 		log.Fatal("Entering System error: ", err)
 	}
 
-	fmt.Printf("Peer INFO [ID: %d, Leader: %t, ListOfNode: %s, Address: %s]\n", peerRep.Id, peerRep.Leader, peerRep.List, address)
 	currentNode = peerRep
 	currentNode.Address = address
 
-	go stopNode()
+	// go stopNode()
 	go chooseAlgorithm()
-	go printLeader() // active to test new leader
+	//go printLeader() // active to test new leader
 
 	/* Listen for RPC */
 	for {
