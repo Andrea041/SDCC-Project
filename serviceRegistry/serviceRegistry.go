@@ -2,8 +2,6 @@ package main
 
 import (
 	"SDCCproject/utils"
-	"fmt"
-
 	"log"
 	"net"
 	"net/rpc"
@@ -18,7 +16,6 @@ var nodeList utils.NodeList
 // ManageNode is the discovery service for each new DockerfilePeer in DS
 func (NodeHandler) ManageNode(peerAddress utils.PeerAddr, nodeInfo *utils.NodeINFO) error {
 	nodes := nodeList.GetAllNodes()
-	fmt.Printf("NewPeerNode: %s\n", peerAddress.PeerAddress)
 
 	// Find max ID
 	maxID := -1

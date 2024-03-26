@@ -98,16 +98,14 @@ func ElectionChangRobert(currentNode utils.NodeINFO, mexReply int) {
 }
 
 func ChangAndRobert(currNode utils.NodeINFO) {
-	if len(currNode.List.GetAllNodes()) == 1 {
-		return
-	}
-
-	if currNode.Id == currNode.List.GetNode(currNode.Leader).Leader {
+	if len(currNode.List.GetAllNodes()) == 1 || currNode.Id == currNode.List.GetNode(currNode.Leader).Leader {
 		return
 	}
 
 	if currNode.Id > currNode.Leader {
+		fmt.Println("--- Start new election ---")
 		ElectionChangRobert(currNode, currNode.Id)
+		return
 	}
 
 	peer, err := rpc.Dial("tcp", currNode.List.GetNode(currNode.Leader).Address)
@@ -117,14 +115,15 @@ func ChangAndRobert(currNode utils.NodeINFO) {
 		return
 	}
 
+	defer func(peer *rpc.Client) {
+		err = peer.Close()
+		if err != nil {
+			log.Fatal("Closing connection error: ", err)
+		}
+	}(peer)
+
 	err = peer.Call("PeerServiceHandler.CheckLeaderStatus", currNode.List.GetNode(currNode.Leader), nil)
 	if err != nil {
 		log.Printf("Ping to leader failed: %v\n", err)
 	}
-
-	err = peer.Close()
-	if err != nil {
-		log.Fatal("Closing connection error: ", err)
-	}
-	fmt.Println("Connection closed")
 }

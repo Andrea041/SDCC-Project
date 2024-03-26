@@ -133,7 +133,7 @@ func chooseAlgorithm() {
 
 func stopNode() {
 	minNum := 0
-	maxNum := 10000000000
+	maxNum := 100000000
 
 	for {
 		randNum := utils.Random(minNum, maxNum)

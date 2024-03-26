@@ -2,7 +2,6 @@ package algorithm
 
 import (
 	"SDCCproject/utils"
-
 	"fmt"
 	"log"
 	"net/rpc"
@@ -52,34 +51,32 @@ func ElectionBully(currNode utils.NodeINFO) {
 }
 
 func Bully(currNode utils.NodeINFO) {
-	if len(currNode.List.GetAllNodes()) == 1 {
-		return
-	}
-
-	if currNode.Id == currNode.List.GetNode(currNode.Leader).Leader {
+	if len(currNode.List.GetAllNodes()) == 1 || currNode.Id == currNode.List.GetNode(currNode.Leader).Leader {
 		return
 	}
 
 	if currNode.Id > currNode.Leader {
+		fmt.Println("--- Start new election ---")
 		ElectionBully(currNode)
 		return
 	}
 
-	/* Ping leader process */
+	/* Attempt to ping leader process */
 	peer, err := rpc.Dial("tcp", currNode.List.GetNode(currNode.Leader).Address)
 	if err != nil {
 		fmt.Println("--- Start new election ---")
 		ElectionBully(currNode)
 		return
 	}
-
+	defer func(peer *rpc.Client) {
+		err = peer.Close()
+		if err != nil {
+			log.Fatal("Closing connection error: ", err)
+		}
+	}(peer)
+	/* Call CheckLeaderStatus on leader */
 	err = peer.Call("PeerServiceHandler.CheckLeaderStatus", currNode.List.GetNode(currNode.Leader), nil)
 	if err != nil {
-		log.Printf("Ping to leader failed: %v\n", err)
-	}
-
-	err = peer.Close()
-	if err != nil {
-		log.Fatal("Closing connection error: ", err)
+		log.Fatal("Ping to leader failed: ", err)
 	}
 }
