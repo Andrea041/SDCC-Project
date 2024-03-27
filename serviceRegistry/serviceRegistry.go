@@ -88,7 +88,7 @@ func main() {
 		log.Fatal("Connection error: ", err)
 	}
 
-	log.Printf("Service registry listening on port %s%s", config.ServiceRegistry.Address, config.ServiceRegistry.Port)
+	log.Printf("Service registry listening on %s%s", config.ServiceRegistry.Address, config.ServiceRegistry.Port)
 
 	for {
 		conn, _ := list.Accept()

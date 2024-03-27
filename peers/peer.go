@@ -153,7 +153,7 @@ func main() {
 		log.Fatal("Wrong service format: ", err)
 	}
 
-	list, err := net.Listen("tcp", "peer:3000")
+	list, err := net.Listen("tcp", "peer:30000")
 	if err != nil {
 		log.Fatal("Connection error: ", err)
 	}

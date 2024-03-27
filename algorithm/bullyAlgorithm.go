@@ -21,12 +21,12 @@ func ElectionBully(currNode utils.NodeINFO) {
 				log.Fatal("Election message forward failed: ", err)
 			}
 
-			if repOK != "" {
-				err = peer.Close()
-				if err != nil {
-					log.Fatal("Closing connection error: ", err)
-				}
+			err = peer.Close()
+			if err != nil {
+				log.Fatal("Closing connection error: ", err)
+			}
 
+			if repOK != "" {
 				return
 			}
 		}
@@ -68,12 +68,14 @@ func Bully(currNode utils.NodeINFO) {
 		ElectionBully(currNode)
 		return
 	}
+
 	defer func(peer *rpc.Client) {
 		err = peer.Close()
 		if err != nil {
 			log.Fatal("Closing connection error: ", err)
 		}
 	}(peer)
+
 	/* Call CheckLeaderStatus on leader */
 	err = peer.Call("PeerServiceHandler.CheckLeaderStatus", currNode.List.GetNode(currNode.Leader), nil)
 	if err != nil {
