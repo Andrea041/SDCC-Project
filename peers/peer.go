@@ -144,16 +144,18 @@ func stopNode() {
 }
 
 func main() {
+	config, err := utils.ReadConfig("/app/config.json")
 	/* Init DockerfilePeer's service */
 	peerService := new(PeerServiceHandler)
 
 	peer := rpc.NewServer()
-	err := peer.Register(peerService)
+	err = peer.Register(peerService)
 	if err != nil {
 		log.Fatal("Wrong service format: ", err)
 	}
 
-	list, err := net.Listen("tcp", "peer:30000")
+	peerAddress := config.Peer.Address + config.Peer.Port
+	list, err := net.Listen("tcp", peerAddress)
 	if err != nil {
 		log.Fatal("Connection error: ", err)
 	}
@@ -161,7 +163,6 @@ func main() {
 	address := list.Addr().String()
 
 	/* Register DockerfilePeer's service on Service Registry */
-	config, err := utils.ReadConfig("/app/config.json")
 	//config, err := utils.ReadConfig("/Users/andreaandreoli/Desktop/projectSDCC/config.json")
 	if err != nil {
 		log.Fatal("Configuration file reading error: ", err)

@@ -2,5 +2,9 @@
   "service_registry": {
     "address": "my-registry",
     "port": ":8888"
+  },
+  "peer": {
+    "address": "peer",
+    "port": ":30000"
   }
 }

@@ -2,15 +2,17 @@ package algorithm
 
 import (
 	"SDCCproject/utils"
+
 	"fmt"
 	"log"
 	"net/rpc"
+	"time"
 )
 
 func ElectionBully(currNode utils.NodeINFO) {
 	for _, node := range currNode.List.GetAllNodes() {
 		if node.Id > currNode.Id {
-			peer, err := rpc.Dial("tcp", node.Address)
+			peer, err := utils.DialTimeout("tcp", node.Address, 5*time.Second)
 			if err != nil {
 				continue
 			}
@@ -33,7 +35,7 @@ func ElectionBully(currNode utils.NodeINFO) {
 	}
 
 	for _, node := range currNode.List.GetAllNodes() {
-		peer, err := rpc.Dial("tcp", node.Address)
+		peer, err := utils.DialTimeout("tcp", node.Address, 5*time.Second)
 		if err != nil {
 			continue
 		}
@@ -62,7 +64,7 @@ func Bully(currNode utils.NodeINFO) {
 	}
 
 	/* Attempt to ping leader process */
-	peer, err := rpc.Dial("tcp", currNode.List.GetNode(currNode.Leader).Address)
+	peer, err := utils.DialTimeout("tcp", currNode.List.GetNode(currNode.Leader).Address, 5*time.Second)
 	if err != nil {
 		fmt.Println("--- Start new election ---")
 		ElectionBully(currNode)

@@ -27,11 +27,12 @@ type Message struct {
 	CurrNode  NodeINFO
 }
 
-type ServiceRegistry struct {
+type Address struct {
 	Address string `json:"address"`
 	Port    string `json:"port"`
 }
 
 type Configuration struct {
-	ServiceRegistry ServiceRegistry `json:"service_registry"`
+	ServiceRegistry Address `json:"service_registry"`
+	Peer            Address `json:"peer"`
 }

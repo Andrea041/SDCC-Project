@@ -2,6 +2,7 @@ package algorithm
 
 import (
 	"SDCCproject/utils"
+	"time"
 
 	"fmt"
 	"log"
@@ -15,7 +16,7 @@ func WinnerMessage(currentNode utils.NodeINFO, leader int) {
 		CurrNode:  currentNode,
 	}
 
-	peer, err := rpc.Dial("tcp", currentNode.List.GetNode((currentNode.Id+1)%len(currentNode.List.Nodes)).Address)
+	peer, err := utils.DialTimeout("tcp", currentNode.List.GetNode((currentNode.Id+1)%len(currentNode.List.Nodes)).Address, 5*time.Second)
 	if err != nil {
 		skip := (currentNode.Id + 1) % len(currentNode.List.Nodes)
 		i := 0
@@ -26,7 +27,7 @@ func WinnerMessage(currentNode utils.NodeINFO, leader int) {
 				return
 			}
 
-			peer, err = rpc.Dial("tcp", currentNode.List.GetNode((currentNode.Id+i)%len(currentNode.List.Nodes)).Address)
+			peer, err = utils.DialTimeout("tcp", currentNode.List.GetNode((currentNode.Id+i)%len(currentNode.List.Nodes)).Address, 5*time.Second)
 			info.SkipCount = i
 			if err != nil {
 				continue
@@ -52,7 +53,7 @@ func ElectionChangRobert(currentNode utils.NodeINFO, mexReply int) {
 
 	info = utils.Message{SkipCount: 1, MexID: mexReply, CurrNode: currentNode}
 
-	peer, err := rpc.Dial("tcp", currentNode.List.GetNode((currentNode.Id+1)%len(currentNode.List.Nodes)).Address)
+	peer, err := utils.DialTimeout("tcp", currentNode.List.GetNode((currentNode.Id+1)%len(currentNode.List.Nodes)).Address, 5*time.Second)
 	if err != nil {
 		skip := (currentNode.Id + 1) % len(currentNode.List.Nodes)
 		i := 0
@@ -61,7 +62,7 @@ func ElectionChangRobert(currentNode utils.NodeINFO, mexReply int) {
 			pass := (currentNode.Id + i) % len(currentNode.List.Nodes)
 			if pass == skip-1 {
 				info.MexID = currentNode.Id
-				peer, err = rpc.Dial("tcp", currentNode.List.GetNode(currentNode.Id).Address)
+				peer, err = utils.DialTimeout("tcp", currentNode.List.GetNode(currentNode.Id).Address, 5*time.Second)
 
 				err = peer.Call("PeerServiceHandler.NewLeaderCR", info, nil)
 				if err != nil {
@@ -76,7 +77,7 @@ func ElectionChangRobert(currentNode utils.NodeINFO, mexReply int) {
 				return
 			}
 
-			peer, err = rpc.Dial("tcp", currentNode.List.GetNode((currentNode.Id+i)%len(currentNode.List.Nodes)).Address)
+			peer, err = utils.DialTimeout("tcp", currentNode.List.GetNode((currentNode.Id+i)%len(currentNode.List.Nodes)).Address, 5*time.Second)
 			info.SkipCount = i
 			if err != nil {
 				continue
@@ -108,7 +109,7 @@ func ChangAndRobert(currNode utils.NodeINFO) {
 		return
 	}
 
-	peer, err := rpc.Dial("tcp", currNode.List.GetNode(currNode.Leader).Address)
+	peer, err := utils.DialTimeout("tcp", currNode.List.GetNode(currNode.Leader).Address, 5*time.Second)
 	if err != nil {
 		fmt.Println("--- Start new election ---")
 		ElectionChangRobert(currNode, currNode.Id)

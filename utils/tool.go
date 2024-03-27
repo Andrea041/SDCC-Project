@@ -4,7 +4,10 @@ import (
 	"crypto/rand"
 	"encoding/json"
 	"math/big"
+	"net"
+	"net/rpc"
 	"os"
+	"time"
 )
 
 func ReadConfig(file string) (Configuration, error) {
@@ -31,4 +34,13 @@ func Random(min, max int) int {
 	}
 
 	return int(num.Int64()) + min
+}
+
+func DialTimeout(network string, address string, timeout time.Duration) (*rpc.Client, error) {
+	conn, err := net.DialTimeout(network, address, timeout)
+	if err != nil {
+		return nil, err
+	}
+
+	return rpc.NewClient(conn), nil
 }
