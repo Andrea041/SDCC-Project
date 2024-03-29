@@ -56,7 +56,7 @@ func main() {
 
 	address := list.Addr().String()
 
-	/* Register DockerfilePeer's service on Service Registry */
+	/* Register Peer's service on Service Registry */
 	if err != nil {
 		log.Fatal("Configuration file reading error: ", err)
 	}
