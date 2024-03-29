@@ -11,7 +11,7 @@ import (
 	"net/rpc"
 )
 
-// Global variable to hold peers in DS
+// Global variable to hold Peer status in DS
 var currentNode utils.NodeINFO
 
 func chooseAlgorithm() {
