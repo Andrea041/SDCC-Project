@@ -28,6 +28,7 @@ func ElectionBully(currNode utils.NodeINFO) {
 				log.Fatal("Closing connection error: ", err)
 			}
 
+			/* Test if the successor node reply */
 			if repOK != "" {
 				return
 			}
