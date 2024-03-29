@@ -32,7 +32,13 @@ type Address struct {
 	Port    string `json:"port"`
 }
 
+type Alg struct {
+	Chang string `json:"ChangAndRobert"`
+	Bully string `json:"Bully"`
+}
+
 type Configuration struct {
 	ServiceRegistry Address `json:"service_registry"`
 	Peer            Address `json:"peer"`
+	Algorithm       Alg     `json:"algorithm"`
 }

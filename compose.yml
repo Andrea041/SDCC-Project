@@ -15,10 +15,10 @@ services:
       dockerfile: DockerfilePeer
     hostname: peer
     ports:
-     - ":30000"
+     - ":6789"
     depends_on:
       - service_registry
     links:
       - service_registry
     deploy:
-      replicas: 8
+      replicas: 3

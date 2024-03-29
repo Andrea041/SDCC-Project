@@ -5,6 +5,10 @@
   },
   "peer": {
     "address": "peer",
-    "port": ":30000"
+    "port": ":6789"
+  },
+  "algorithm": {
+    "ChangAndRobert": "false",
+    "Bully": "true"
   }
 }

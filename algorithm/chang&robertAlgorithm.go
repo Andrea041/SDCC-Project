@@ -2,11 +2,11 @@ package algorithm
 
 import (
 	"SDCCproject/utils"
-	"time"
 
 	"fmt"
 	"log"
 	"net/rpc"
+	"time"
 )
 
 func WinnerMessage(currentNode utils.NodeINFO, leader int) {
