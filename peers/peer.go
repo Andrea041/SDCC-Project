@@ -11,7 +11,7 @@ import (
 	"net/rpc"
 )
 
-// Global variable to hold Peer status in DS
+// Global variable to hold peer status in DS
 var currentNode utils.NodeINFO
 
 func chooseAlgorithm() {
@@ -39,7 +39,7 @@ func chooseAlgorithm() {
 func main() {
 	config, err := utils.ReadConfig("/app/config.json")
 
-	/* Init Peer's service */
+	/* Init peer's service */
 	peerService := new(PeerServiceHandler)
 
 	peer := rpc.NewServer()
@@ -56,7 +56,7 @@ func main() {
 
 	address := list.Addr().String()
 
-	/* Register Peer's service on Service Registry */
+	/* Register peer's service on Service Registry */
 	if err != nil {
 		log.Fatal("Configuration file reading error: ", err)
 	}
