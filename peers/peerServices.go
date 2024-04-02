@@ -59,6 +59,7 @@ func (PeerServiceHandler) NewLeaderCR(mex utils.Message, _ *utils.NodeINFO) erro
 		return nil
 	}
 
+	/* Optional */
 	for _, node := range currentNode.List.GetAllNodes() {
 		currentNode.List.UpdateNode(node, mex.MexID)
 	}
@@ -69,13 +70,13 @@ func (PeerServiceHandler) NewLeaderCR(mex utils.Message, _ *utils.NodeINFO) erro
 }
 
 func (PeerServiceHandler) ElectionMessageCR(mex utils.Message, _ *int) error {
-	currID := (mex.CurrNode.Id + mex.SkipCount) % len(currentNode.List.Nodes)
+	currID := currentNode.Id
 
 	if mex.MexID > currID {
-		go algorithm.ElectionChangRoberts(currentNode.List.GetNode(currID), mex.MexID)
+		go algorithm.ElectionChangAndRoberts(currentNode.List.GetNode(currID), mex.MexID)
 	} else if mex.MexID < currID {
 		mex.MexID = currID
-		go algorithm.ElectionChangRoberts(currentNode.List.GetNode(currID), mex.MexID)
+		go algorithm.ElectionChangAndRoberts(currentNode.List.GetNode(currID), mex.MexID)
 	} else if mex.MexID == currID {
 		info := utils.Message{
 			SkipCount: 1,

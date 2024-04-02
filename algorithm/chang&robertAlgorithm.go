@@ -48,13 +48,14 @@ func WinnerMessage(currentNode utils.NodeINFO, leader int) {
 	}
 }
 
-func ElectionChangRoberts(currentNode utils.NodeINFO, mexReply int) {
+func ElectionChangAndRoberts(currentNode utils.NodeINFO, mexReply int) {
 	var info utils.Message
 
 	info = utils.Message{SkipCount: 1, MexID: mexReply, CurrNode: currentNode}
 
 	peer, err := utils.DialTimeout("tcp", currentNode.List.GetNode((currentNode.Id+1)%len(currentNode.List.Nodes)).Address, 5*time.Second)
 	if err != nil {
+		/* Calculate skip for node inactivity */
 		skip := (currentNode.Id + 1) % len(currentNode.List.Nodes)
 		i := 0
 		for {
@@ -108,14 +109,14 @@ func ChangAndRoberts(currNode utils.NodeINFO) {
 
 	if currNode.Id > currNode.Leader {
 		fmt.Println("--- Start new election ---")
-		ElectionChangRoberts(currNode, currNode.Id)
+		ElectionChangAndRoberts(currNode, currNode.Id)
 		return
 	}
 
 	peer, err := utils.DialTimeout("tcp", currNode.List.GetNode(currNode.Leader).Address, 5*time.Second)
 	if err != nil {
 		fmt.Println("--- Start new election ---")
-		ElectionChangRoberts(currNode, currNode.Id)
+		ElectionChangAndRoberts(currNode, currNode.Id)
 		return
 	}
 
