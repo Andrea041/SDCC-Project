@@ -32,7 +32,7 @@ func (NodeHandler) ManageNode(peerAddress utils.PeerAddr, nodeInfo *utils.NodeIN
 	newID := maxID + 1
 
 	var newNode utils.Node
-	newNode = utils.Node{Id: newID, Address: peerAddress.PeerAddress, Leader: 0}
+	newNode = utils.Node{Id: newID, Address: peerAddress.PeerAddress, Leader: -1}
 
 	nodeList.AddNode(newNode)
 

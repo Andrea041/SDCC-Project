@@ -39,9 +39,10 @@ func (PeerServiceHandler) ElectionMessageBULLY(nodeCaller utils.NodeINFO, rep *s
 	return nil
 }
 
-func (PeerServiceHandler) NewLeader(leaderNode utils.NodeINFO, _ *utils.NodeINFO) error {
+func (PeerServiceHandler) NewLeaderBULLY(leaderNode utils.NodeINFO, _ *utils.NodeINFO) error {
 	currentNode.Leader = leaderNode.Id
 
+	/* Optional */
 	for _, node := range leaderNode.List.GetAllNodes() {
 		currentNode.List.UpdateNode(node, leaderNode.Id)
 	}

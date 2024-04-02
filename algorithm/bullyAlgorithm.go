@@ -41,7 +41,7 @@ func ElectionBully(currNode utils.NodeINFO) {
 			continue
 		}
 
-		err = peer.Call("PeerServiceHandler.NewLeader", currNode.List.GetNode(currNode.Id), nil)
+		err = peer.Call("PeerServiceHandler.NewLeaderBULLY", currNode.List.GetNode(currNode.Id), nil)
 		if err != nil {
 			log.Fatal("Leader update error: ", err)
 		}
@@ -55,9 +55,14 @@ func ElectionBully(currNode utils.NodeINFO) {
 
 func Bully(currNode utils.NodeINFO) {
 	if len(currNode.List.GetAllNodes()) == 1 || currNode.Id == currNode.List.GetNode(currNode.Leader).Leader {
+		/* First iteration by the peer if Leader = -1 */
+		if currNode.Leader == -1 {
+			currNode.Leader = currNode.Id
+		}
 		return
 	}
 
+	/* Performed only when new peer enter the system because it has Leader = -1 */
 	if currNode.Id > currNode.Leader {
 		fmt.Println("--- Start new election ---")
 		ElectionBully(currNode)

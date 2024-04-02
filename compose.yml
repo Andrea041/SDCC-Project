@@ -7,7 +7,7 @@ services:
       dockerfile: DockerfileServiceRegistry
     hostname: my-registry
     ports:
-      - "8888:8888"
+      - ":8888"
 
   peer:
     build:
@@ -21,4 +21,4 @@ services:
     links:
       - service_registry
     deploy:
-      replicas: 3
+      replicas: 10

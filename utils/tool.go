@@ -47,7 +47,7 @@ func DialTimeout(network string, address string, timeout time.Duration) (*rpc.Cl
 
 func StopNode(currentNode NodeINFO) {
 	minNum := 0
-	maxNum := 100000000
+	maxNum := 10000000
 
 	for {
 		randNum := Random(minNum, maxNum)

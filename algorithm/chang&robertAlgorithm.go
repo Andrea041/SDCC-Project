@@ -100,6 +100,9 @@ func ElectionChangRobert(currentNode utils.NodeINFO, mexReply int) {
 
 func ChangAndRobert(currNode utils.NodeINFO) {
 	if len(currNode.List.GetAllNodes()) == 1 || currNode.Id == currNode.List.GetNode(currNode.Leader).Leader {
+		if currNode.Leader == -1 {
+			currNode.Leader = currNode.Id
+		}
 		return
 	}
 
