@@ -25,7 +25,7 @@ func chooseAlgorithm() {
 		if config.Algorithm.Bully == "true" {
 			algorithm.Bully(currentNode)
 		} else if config.Algorithm.Chang == "true" {
-			algorithm.ChangAndRobert(currentNode)
+			algorithm.ChangAndRoberts(currentNode)
 		} else {
 			fmt.Println("Configuration file format wrong!")
 		}

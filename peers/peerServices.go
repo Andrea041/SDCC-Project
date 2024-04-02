@@ -72,10 +72,10 @@ func (PeerServiceHandler) ElectionMessageCR(mex utils.Message, _ *int) error {
 	currID := (mex.CurrNode.Id + mex.SkipCount) % len(currentNode.List.Nodes)
 
 	if mex.MexID > currID {
-		go algorithm.ElectionChangRobert(currentNode.List.GetNode(currID), mex.MexID)
+		go algorithm.ElectionChangRoberts(currentNode.List.GetNode(currID), mex.MexID)
 	} else if mex.MexID < currID {
 		mex.MexID = currID
-		go algorithm.ElectionChangRobert(currentNode.List.GetNode(currID), mex.MexID)
+		go algorithm.ElectionChangRoberts(currentNode.List.GetNode(currID), mex.MexID)
 	} else if mex.MexID == currID {
 		info := utils.Message{
 			SkipCount: 1,
