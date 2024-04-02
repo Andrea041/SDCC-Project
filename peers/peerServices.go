@@ -17,7 +17,15 @@ func (PeerServiceHandler) UpdateList(node utils.Node, _ *utils.NodeINFO) error {
 	currentNode.List.GetAllNodes()
 	currentNode.List.AddNode(node)
 
-	fmt.Printf("New peer in system, list updated\n")
+	/*shuffledList := make([]utils.Node, len(currentNode.List.Nodes))
+	perm := rand.Perm(len(currentNode.List.Nodes))
+	for i, v := range perm {
+		shuffledList[i] = currentNode.List.Nodes[v]
+	}
+	currentNode.List.Nodes = shuffledList
+	*/
+
+	fmt.Printf("New peer in system, list updated %s\n", currentNode.List.Nodes)
 
 	return nil
 }
@@ -86,18 +94,21 @@ func (PeerServiceHandler) ElectionMessageCR(mex utils.Message, _ *int) error {
 
 		currentNode.Leader = mex.MexID
 
-		peer, err := utils.DialTimeout("tcp", currentNode.List.GetNode((currentNode.Id+1)%len(currentNode.List.Nodes)).Address, 5*time.Second)
+		startIndex := currentNode.List.GetIndex(currentNode.Id)
+		nextNode := currentNode.List.Nodes[(startIndex+1)%len(currentNode.List.Nodes)]
+
+		peer, err := utils.DialTimeout("tcp", currentNode.List.GetNode(nextNode.Id).Address, 5*time.Second)
 		if err != nil {
-			skip := (currentNode.Id + 1) % len(currentNode.List.Nodes)
+			skip := startIndex
 			i := 1
 			for {
 				i++
-				pass := (currentNode.Id + i) % len(currentNode.List.Nodes)
+				pass := (startIndex + i) % len(currentNode.List.Nodes)
 				if pass == skip-1 {
 					return nil
 				}
 
-				peer, err = utils.DialTimeout("tcp", currentNode.List.GetNode((currentNode.Id+i)%len(currentNode.List.Nodes)).Address, 5*time.Second)
+				peer, err = utils.DialTimeout("tcp", currentNode.List.GetNode(currentNode.List.Nodes[pass].Id).Address, 5*time.Second)
 				info.SkipCount = i
 				if err != nil {
 					continue

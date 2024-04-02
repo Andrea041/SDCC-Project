@@ -16,18 +16,21 @@ func WinnerMessage(currentNode utils.NodeINFO, leader int) {
 		CurrNode:  currentNode,
 	}
 
-	peer, err := utils.DialTimeout("tcp", currentNode.List.GetNode((currentNode.Id+1)%len(currentNode.List.Nodes)).Address, 5*time.Second)
+	startIndex := currentNode.List.GetIndex(currentNode.Id)
+	nextNode := currentNode.List.Nodes[(startIndex+1)%len(currentNode.List.Nodes)]
+
+	peer, err := utils.DialTimeout("tcp", currentNode.List.GetNode(nextNode.Id).Address, 5*time.Second)
 	if err != nil {
-		skip := (currentNode.Id + 1) % len(currentNode.List.Nodes)
+		skip := startIndex
 		i := 0
 		for {
 			i++
-			pass := (currentNode.Id + i) % len(currentNode.List.Nodes)
+			pass := (startIndex + i) % len(currentNode.List.Nodes)
 			if pass == skip-1 {
 				return
 			}
 
-			peer, err = utils.DialTimeout("tcp", currentNode.List.GetNode((currentNode.Id+i)%len(currentNode.List.Nodes)).Address, 5*time.Second)
+			peer, err = utils.DialTimeout("tcp", currentNode.List.GetNode(currentNode.List.Nodes[pass].Id).Address, 5*time.Second)
 			info.SkipCount = i
 			if err != nil {
 				continue
@@ -53,14 +56,17 @@ func ElectionChangAndRoberts(currentNode utils.NodeINFO, mexReply int) {
 
 	info = utils.Message{SkipCount: 1, MexID: mexReply, CurrNode: currentNode}
 
-	peer, err := utils.DialTimeout("tcp", currentNode.List.GetNode((currentNode.Id+1)%len(currentNode.List.Nodes)).Address, 5*time.Second)
+	startIndex := currentNode.List.GetIndex(currentNode.Id)
+	nextNode := currentNode.List.Nodes[(startIndex+1)%len(currentNode.List.Nodes)]
+
+	peer, err := utils.DialTimeout("tcp", currentNode.List.GetNode(nextNode.Id).Address, 5*time.Second)
 	if err != nil {
 		/* Calculate skip for node inactivity */
-		skip := (currentNode.Id + 1) % len(currentNode.List.Nodes)
+		skip := startIndex
 		i := 0
 		for {
 			i++
-			pass := (currentNode.Id + i) % len(currentNode.List.Nodes)
+			pass := (startIndex + i) % len(currentNode.List.Nodes)
 			if pass == skip-1 {
 				info.MexID = currentNode.Id
 				peer, err = utils.DialTimeout("tcp", currentNode.List.GetNode(currentNode.Id).Address, 5*time.Second)
@@ -78,7 +84,7 @@ func ElectionChangAndRoberts(currentNode utils.NodeINFO, mexReply int) {
 				return
 			}
 
-			peer, err = utils.DialTimeout("tcp", currentNode.List.GetNode((currentNode.Id+i)%len(currentNode.List.Nodes)).Address, 5*time.Second)
+			peer, err = utils.DialTimeout("tcp", currentNode.List.GetNode(currentNode.List.Nodes[pass].Id).Address, 5*time.Second)
 			info.SkipCount = i
 			if err != nil {
 				continue
@@ -100,19 +106,22 @@ func ElectionChangAndRoberts(currentNode utils.NodeINFO, mexReply int) {
 }
 
 func ChangAndRoberts(currNode utils.NodeINFO) {
-	if len(currNode.List.GetAllNodes()) == 1 || currNode.Id == currNode.List.GetNode(currNode.Leader).Leader {
+	if len(currNode.List.GetAllNodes()) == 1 || currNode.Id == currNode.List.GetNode(currNode.Leader).Id {
+		/* First iteration by the peer if Leader = -1 */
 		if currNode.Leader == -1 {
 			currNode.Leader = currNode.Id
 		}
 		return
 	}
 
+	/* Performed only when new peer enter the system because it has Leader = -1 */
 	if currNode.Id > currNode.Leader {
 		fmt.Println("--- Start new election ---")
 		ElectionChangAndRoberts(currNode, currNode.Id)
 		return
 	}
 
+	/* Attempt to ping leader process */
 	peer, err := utils.DialTimeout("tcp", currNode.List.GetNode(currNode.Leader).Address, 5*time.Second)
 	if err != nil {
 		fmt.Println("--- Start new election ---")

@@ -54,15 +54,15 @@ func ElectionBully(currNode utils.NodeINFO) {
 }
 
 func Bully(currNode utils.NodeINFO) {
-	if len(currNode.List.GetAllNodes()) == 1 || currNode.Id == currNode.List.GetNode(currNode.Leader).Leader {
-		/* First iteration by the peer if Leader = -1 */
+	if len(currNode.List.GetAllNodes()) == 1 || currNode.Id == currNode.List.GetNode(currNode.Leader).Id {
+		/* First iteration by the peer if leader = -1 */
 		if currNode.Leader == -1 {
 			currNode.Leader = currNode.Id
 		}
 		return
 	}
 
-	/* Performed only when new peer enter the system because it has Leader = -1 */
+	/* Performed only when new peer enter the system because it has leader = -1 */
 	if currNode.Id > currNode.Leader {
 		fmt.Println("--- Start new election ---")
 		ElectionBully(currNode)

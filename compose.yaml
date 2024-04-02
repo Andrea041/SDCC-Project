@@ -21,4 +21,4 @@ services:
     links:
       - service_registry
     deploy:
-      replicas: 10
+      replicas: 3

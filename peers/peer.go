@@ -32,7 +32,7 @@ func chooseAlgorithm() {
 
 		/* Delay and print actual leader */
 		fmt.Printf("Leader: %d\n", currentNode.Leader)
-		time.Sleep(time.Second) // To test Chang & Robert increase the delay value
+		time.Sleep(30 * time.Second) // To test Chang & Robert increase the delay value
 	}
 }
 

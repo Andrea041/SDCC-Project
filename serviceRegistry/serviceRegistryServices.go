@@ -16,7 +16,7 @@ func (NodeHandler) ManageNode(peerAddress utils.PeerAddr, nodeInfo *utils.NodeIN
 
 	maxID := -1
 	for _, node := range nodes {
-		/* Test if the node was already in the system */
+		/* Check if the node was already in the system */
 		if peerAddress.PeerAddress == node.Address {
 			nodeInfo.Id = node.Id
 			nodeInfo.List.Nodes = nodeList.GetAllNodes()
