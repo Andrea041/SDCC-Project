@@ -59,7 +59,8 @@ func (PeerServiceHandler) NewLeaderBULLY(leaderNode utils.NodeINFO, _ *utils.Nod
 }
 
 func (PeerServiceHandler) NewLeaderCR(mex utils.Message, _ *utils.NodeINFO) error {
-	nextNode := (mex.CurrNode.Id + mex.SkipCount) % len(currentNode.List.Nodes)
+	startIndex := currentNode.List.GetIndex(currentNode.Id)
+	nextNode := (startIndex + mex.SkipCount) % len(currentNode.List.Nodes)
 
 	if currentNode.Leader != mex.MexID {
 		currentNode.Leader = mex.MexID
@@ -72,7 +73,7 @@ func (PeerServiceHandler) NewLeaderCR(mex utils.Message, _ *utils.NodeINFO) erro
 		currentNode.List.UpdateNode(node, mex.MexID)
 	}
 
-	go algorithm.WinnerMessage(currentNode.List.GetNode(nextNode), mex.MexID)
+	go algorithm.WinnerMessage(currentNode.List.GetNodeByIndex(nextNode), mex.MexID)
 
 	return nil
 }

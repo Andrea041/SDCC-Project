@@ -14,7 +14,6 @@ type NodeHandler struct{}
 func (NodeHandler) ManageNode(peerAddress utils.PeerAddr, nodeInfo *utils.NodeINFO) error {
 	nodes := nodeList.GetAllNodes()
 
-	maxID := -1
 	for _, node := range nodes {
 		/* Check if the node was already in the system */
 		if peerAddress.PeerAddress == node.Address {
@@ -24,12 +23,9 @@ func (NodeHandler) ManageNode(peerAddress utils.PeerAddr, nodeInfo *utils.NodeIN
 
 			return nil
 		}
-
-		if node.Id > maxID {
-			maxID = node.Id
-		}
 	}
-	newID := maxID + 1
+
+	newID := utils.Random(0, 20)
 
 	var newNode utils.Node
 	newNode = utils.Node{Id: newID, Address: peerAddress.PeerAddress, Leader: -1}
