@@ -73,7 +73,6 @@ func (PeerServiceHandler) ElectionMessageCR(mex utils.Message, _ *int) error {
 		mex.MexID = currID
 		go algorithm.ElectionChangAndRoberts(currentNode.List.GetNode(currID), mex.MexID)
 	} else if mex.MexID == currID {
-		fmt.Println("Forwarding winner message")
 		currentNode.Leader = currID
 
 		go algorithm.WinnerMessage(currentNode, mex.MexID)
