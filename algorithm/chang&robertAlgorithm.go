@@ -108,10 +108,6 @@ func ElectionChangAndRoberts(currentNode utils.NodeINFO, mexReply int) {
 
 func ChangAndRoberts(currNode utils.NodeINFO) {
 	if len(currNode.List.GetAllNodes()) == 1 || currNode.Id == currNode.List.GetNode(currNode.Leader).Id {
-		/* First iteration by the peer if Leader = -1 */
-		if currNode.Leader == -1 {
-			currNode.Leader = currNode.Id
-		}
 		return
 	}
 
@@ -137,7 +133,7 @@ func ChangAndRoberts(currNode utils.NodeINFO) {
 		}
 	}(peer)
 
-	err = peer.Call("PeerServiceHandler.CheckLeaderStatus", currNode.List.GetNode(currNode.Leader), nil)
+	err = peer.Call("PeerServiceHandler.CheckLeaderStatus", currNode, nil)
 	if err != nil {
 		log.Printf("Ping to leader failed: %v\n", err)
 	}

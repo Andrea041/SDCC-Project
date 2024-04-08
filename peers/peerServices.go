@@ -3,10 +3,7 @@ package main
 import (
 	"SDCCproject/algorithm"
 	"SDCCproject/utils"
-	"time"
-
 	"fmt"
-	"log"
 )
 
 // PeerServiceHandler is the interface which exposes the RPC method ManageNode
@@ -17,22 +14,14 @@ func (PeerServiceHandler) UpdateList(node utils.Node, _ *utils.NodeINFO) error {
 	currentNode.List.GetAllNodes()
 	currentNode.List.AddNode(node)
 
-	/*shuffledList := make([]utils.Node, len(currentNode.List.Nodes))
-	perm := rand.Perm(len(currentNode.List.Nodes))
-	for i, v := range perm {
-		shuffledList[i] = currentNode.List.Nodes[v]
-	}
-	currentNode.List.Nodes = shuffledList
-	*/
-
-	fmt.Printf("New peer in system, list updated %s\n", currentNode.List.Nodes)
+	fmt.Println("New peer in system")
 
 	return nil
 }
 
 // CheckLeaderStatus is a service that realize the ping to this node
-func (PeerServiceHandler) CheckLeaderStatus(_ utils.Node, _ *utils.NodeINFO) error {
-	fmt.Printf("Hi i'm the leader with address: %s, and id: %d. I'm still active!\n", currentNode.Address, currentNode.Id)
+func (PeerServiceHandler) CheckLeaderStatus(callerNode utils.Node, _ *utils.NodeINFO) error {
+	fmt.Printf("Ping received from process %d\n", callerNode.Id)
 
 	return nil
 }
@@ -59,10 +48,7 @@ func (PeerServiceHandler) NewLeaderBULLY(leaderNode utils.NodeINFO, _ *utils.Nod
 }
 
 func (PeerServiceHandler) NewLeaderCR(mex utils.Message, _ *utils.NodeINFO) error {
-	startIndex := currentNode.List.GetIndex(currentNode.Id)
-	nextNode := (startIndex + mex.SkipCount) % len(currentNode.List.Nodes)
-
-	if currentNode.Leader != mex.MexID {
+	if mex.MexID != currentNode.Id {
 		currentNode.Leader = mex.MexID
 	} else {
 		return nil
@@ -73,7 +59,7 @@ func (PeerServiceHandler) NewLeaderCR(mex utils.Message, _ *utils.NodeINFO) erro
 		currentNode.List.UpdateNode(node, mex.MexID)
 	}
 
-	go algorithm.WinnerMessage(currentNode.List.GetNodeByIndex(nextNode), mex.MexID)
+	go algorithm.WinnerMessage(currentNode, mex.MexID)
 
 	return nil
 }
@@ -87,47 +73,10 @@ func (PeerServiceHandler) ElectionMessageCR(mex utils.Message, _ *int) error {
 		mex.MexID = currID
 		go algorithm.ElectionChangAndRoberts(currentNode.List.GetNode(currID), mex.MexID)
 	} else if mex.MexID == currID {
-		info := utils.Message{
-			SkipCount: 1,
-			MexID:     mex.MexID,
-			CurrNode:  currentNode.List.GetNode(currID),
-		}
+		fmt.Println("Forwarding winner message")
+		currentNode.Leader = currID
 
-		currentNode.Leader = mex.MexID
-
-		startIndex := currentNode.List.GetIndex(currentNode.Id)
-		nextNode := currentNode.List.Nodes[(startIndex+1)%len(currentNode.List.Nodes)]
-
-		peer, err := utils.DialTimeout("tcp", currentNode.List.GetNode(nextNode.Id).Address, 5*time.Second)
-		if err != nil {
-			skip := startIndex
-			i := 1
-			for {
-				i++
-				pass := (startIndex + i) % len(currentNode.List.Nodes)
-				if pass == skip-1 {
-					return nil
-				}
-
-				peer, err = utils.DialTimeout("tcp", currentNode.List.GetNode(currentNode.List.Nodes[pass].Id).Address, 5*time.Second)
-				info.SkipCount = i
-				if err != nil {
-					continue
-				} else {
-					break
-				}
-			}
-		}
-
-		err = peer.Call("PeerServiceHandler.NewLeaderCR", info, nil)
-		if err != nil {
-			log.Printf("New leader update error: %v", err)
-		}
-
-		err = peer.Close()
-		if err != nil {
-			log.Fatalf("Closing connection error: %v\n", err)
-		}
+		go algorithm.WinnerMessage(currentNode, mex.MexID)
 	}
 
 	return nil

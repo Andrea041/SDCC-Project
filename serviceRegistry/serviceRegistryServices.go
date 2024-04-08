@@ -25,7 +25,14 @@ func (NodeHandler) ManageNode(peerAddress utils.PeerAddr, nodeInfo *utils.NodeIN
 		}
 	}
 
+redo:
 	newID := utils.Random(0, 20)
+	for _, node := range nodes {
+		/* Check if ID was already assigned */
+		if newID == node.Id {
+			goto redo
+		}
+	}
 
 	var newNode utils.Node
 	newNode = utils.Node{Id: newID, Address: peerAddress.PeerAddress, Leader: -1}

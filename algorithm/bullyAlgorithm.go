@@ -30,6 +30,7 @@ func ElectionBully(currNode utils.NodeINFO) {
 
 			/* Test if the successor node reply */
 			if repOK != "" {
+				/* Don't call other processes: one bigger ID is ac */
 				return
 			}
 		}
@@ -55,10 +56,6 @@ func ElectionBully(currNode utils.NodeINFO) {
 
 func Bully(currNode utils.NodeINFO) {
 	if len(currNode.List.GetAllNodes()) == 1 || currNode.Id == currNode.List.GetNode(currNode.Leader).Id {
-		/* First iteration by the peer if leader = -1 */
-		if currNode.Leader == -1 {
-			currNode.Leader = currNode.Id
-		}
 		return
 	}
 
@@ -85,7 +82,7 @@ func Bully(currNode utils.NodeINFO) {
 	}(peer)
 
 	/* Call CheckLeaderStatus on leader */
-	err = peer.Call("PeerServiceHandler.CheckLeaderStatus", currNode.List.GetNode(currNode.Leader), nil)
+	err = peer.Call("PeerServiceHandler.CheckLeaderStatus", currNode, nil)
 	if err != nil {
 		log.Fatal("Ping to leader failed: ", err)
 	}
