@@ -19,7 +19,7 @@ Software that must be installed on your computer:
 - Docker Compose v2.24.6-desktop.1 or later
 
 ### Choose algorithm to test
-To choose the algorithm you have to set (true or false value) in config.json file:
+To choose the algorithm you have to set "true" or "false" in config.json file:
 ```json
 "algorithm": {
     "ChangAndRobert": "false",
