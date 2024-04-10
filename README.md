@@ -1,4 +1,4 @@
-# Implementation of 2 distributed leader election algorithms for Distributed System & Cloud Computing course
+# Implementation of two distributed leader election algorithms for Distributed System & Cloud Computing course
 
 ## Introduction
 A distributed system is a collection of independent network nodes that do not share memory. Each processor on every node has its own memory and communicates with others through the network. Network communication is implemented via a process on one machine communicating with a process on another machine.
@@ -21,8 +21,10 @@ Software that must be installed on your computer:
 ### Choose algorithm to test
 To choose the algorithm you have to set (true or false value) in config.json file:
 ```json
-sudo service docker start
-docker-compose up -d
+"algorithm": {
+    "ChangAndRobert": "false",
+    "Bully": "true"
+  }
 ```
 
 
