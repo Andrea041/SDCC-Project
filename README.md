@@ -1,6 +1,6 @@
 # Implementation of 2 distributed leader election algorithms for Distributed System & Cloud Computing course
 
-## Summary
+## Introduction
 A distributed system is a collection of independent network nodes that do not share memory. Each processor on every node has its own memory and communicates with others through the network. Network communication is implemented via a process on one machine communicating with a process on another machine.
 
 Many algorithms used in distributed systems require the presence of a coordinator or leader responsible for carrying out necessary functions for other processes in the system. For the selection of a new coordinator, election algorithms have been specifically designed.
@@ -10,3 +10,8 @@ Election algorithms select a process from a group of processes to act as coordin
 The algorithms are:
 - Bully Algorithm
 - Chang-Roberts Algorithm
+
+## Instruction to run the code
+### Software
+Software that must be installed:
+- go 
