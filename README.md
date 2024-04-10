@@ -13,5 +13,10 @@ The algorithms are:
 
 ## Instruction to run the code
 ### Software
-Software that must be installed:
-- go 
+Software that must be installed on your computer:
+- go 1.22.2 darwin/amd64
+- Docker 25.0.3, build 4debf41
+- Docker Compose v2.24.6-desktop.1
+- AWS EC2 instance
+
+### Run code
