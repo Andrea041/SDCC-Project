@@ -20,6 +20,8 @@ Software that must be installed on your computer:
 
 ### Installation
 To install this application on your computer, run this git command:
+```bash
 git clone https://github.com/Andrea041/Distributed-System-And-Cloud-Computing-Project
+```
 
 ### Run code
