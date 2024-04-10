@@ -11,12 +11,15 @@ The algorithms are:
 - Bully Algorithm
 - Chang-Roberts Algorithm
 
-## Instruction to run the code
-### Software
+## Requirements & Instruction to run the code
+### Software requirements
 Software that must be installed on your computer:
 - go 1.22.2 darwin/amd64
 - Docker 25.0.3, build 4debf41
 - Docker Compose v2.24.6-desktop.1
-- AWS EC2 instance
+
+### Installation
+To install this application on your computer, run this git command:
+git clone https://github.com/Andrea041/Distributed-System-And-Cloud-Computing-Project
 
 ### Run code
