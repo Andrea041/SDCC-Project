@@ -30,7 +30,7 @@ func ElectionBully(currNode utils.NodeINFO) {
 
 			/* Test if the successor node reply */
 			if repOK != "" {
-				/* Don't call other processes: one bigger ID is ac */
+				/* Don't call other processes: one bigger ID is active */
 				return
 			}
 		}
