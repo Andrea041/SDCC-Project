@@ -90,9 +90,9 @@ func main() {
 	currentNode = peerRep
 	currentNode.Address = address
 
-	fmt.Printf("Your ID: %d, your address: %s, Nodes in system: %s\n", currentNode.Id, currentNode.Address, currentNode.List.Nodes)
+	fmt.Printf("Your ID: %d, your address: %s\n", currentNode.Id, currentNode.Address)
 
-	//go utils.StopNode(currentNode) // To simulate the auto peer crash uncomment this line
+	// go utils.StopNode(currentNode) // To simulate the auto peer crash uncomment this line
 	go chooseAlgorithm()
 
 	/* Listen for RPC */
