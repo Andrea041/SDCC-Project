@@ -1,4 +1,4 @@
-# Implementation of 2 distributed leader election algorithms for Distributed System & Cloud Computing course
+# Implementation of two distributed leader election algorithms for Distributed System & Cloud Computing course
 
 ## Introduction
 A distributed system is a collection of independent network nodes that do not share memory. Each processor on every node has its own memory and communicates with others through the network. Network communication is implemented via a process on one machine communicating with a process on another machine.
@@ -11,12 +11,77 @@ The algorithms are:
 - Bully Algorithm
 - Chang-Roberts Algorithm
 
-## Instruction to run the code
-### Software
+## Requirements & Instruction to run the code
+### Software requirements
 Software that must be installed on your computer:
-- go 1.22.2 darwin/amd64
-- Docker 25.0.3, build 4debf41
-- Docker Compose v2.24.6-desktop.1
-- AWS EC2 instance
+- go 1.22.2 darwin/amd64 (or any compatible version)
+- Docker 25.0.3 (build 4debf41 recommended)
+- Docker Compose v2.24.6-desktop.1 or later
 
-### Run code
+### Choose algorithm to test
+To choose the algorithm you have to set "true" or "false" in config.json file:
+```json
+"algorithm": {
+    "ChangAndRobert": "false",
+    "Bully": "true"
+  }
+```
+
+
+### Run code without AWS EC2 istance
+If you want try this application without AWS EC2 istance, you have to clone this repository on your computer:
+```bash
+git clone https://github.com/Andrea041/Distributed-System-And-Cloud-Computing-Project
+```
+Then start Docker daemon and run Docker Compose:
+```bash
+sudo service docker start
+docker-compose up -d
+```
+
+### Run code with AWS EC2 istance
+If you want try this application with AWS EC2 istance (Amazon Linux OS), you have to create an EC2 istance and connect to it:
+```bash
+ssh -i <path_to_PEM> ec2-user@<ip-EC2-instance>
+```
+First of all you have to install git command:
+```bash
+sudo yum update -y
+sudo yum install git -y
+```
+Then you have to clone this repository:
+```bash
+git clone https://github.com/Andrea041/Distributed-System-And-Cloud-Computing-Project
+```
+Now install Docker:
+```bash
+sudo yum install -y docker
+```
+And Docker Compose:
+```bash
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+```
+Run Docker daemon:
+```bash
+sudo service docker start
+```
+Finally run Docker Compose command:
+```bash
+sudo docker-compose -f compose.yaml up
+```
+
+## Some useful commands to test the program
+### Docker
+- Stop one container:
+```bash
+docker kill <Container ID>
+```
+- Restart one container:
+```bash
+docker restart <Container ID>
+```
+- Stop all containers:
+```bash
+docker stop $(docker ps -a -q)
+```
