@@ -70,3 +70,18 @@ Finally run Docker Compose command:
 ```bash
 sudo docker-compose -f compose.yaml up
 ```
+
+## Some useful commands to test the program
+### Docker
+- Stop one container:
+```bash
+docker kill <Container ID>
+```
+- Restart one container:
+```bash
+docker restart <Container ID>
+```
+- Stop all containers:
+```bash
+docker stop $(docker ps -a -q)
+```
