@@ -14,8 +14,6 @@ func (PeerServiceHandler) UpdateList(node utils.Node, _ *utils.NodeINFO) error {
 	currentNode.List.GetAllNodes()
 	currentNode.List.AddNode(node)
 
-	fmt.Println("New peer in system")
-
 	return nil
 }
 
@@ -28,7 +26,6 @@ func (PeerServiceHandler) CheckLeaderStatus(callerNode utils.Node, _ *utils.Node
 
 // ElectionMessageBULLY is a service that reply "OK" in rep to the caller node
 func (PeerServiceHandler) ElectionMessageBULLY(nodeCaller utils.NodeINFO, rep *string) error {
-	fmt.Printf("Election message from Peer with id: %d\n", nodeCaller.Id)
 	*rep = "OK"
 
 	go algorithm.ElectionBully(currentNode)
