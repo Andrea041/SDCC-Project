@@ -25,7 +25,7 @@ func (PeerServiceHandler) CheckLeaderStatus(callerNode utils.Node, _ *utils.Node
 }
 
 // ElectionMessageBULLY is a service that reply "OK" in rep to the caller node
-func (PeerServiceHandler) ElectionMessageBULLY(nodeCaller utils.NodeINFO, rep *string) error {
+func (PeerServiceHandler) ElectionMessageBULLY(_ utils.NodeINFO, rep *string) error {
 	*rep = "OK"
 
 	go algorithm.ElectionBully(currentNode)
