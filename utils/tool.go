@@ -3,6 +3,7 @@ package utils
 import (
 	"crypto/rand"
 	"encoding/json"
+	"fmt"
 	"math/big"
 	"net"
 	"net/rpc"
@@ -10,7 +11,7 @@ import (
 	"time"
 )
 
-func ReadConfig(file string) (Configuration, error) {
+func ReadConfigJSON(file string) (Configuration, error) {
 	var config Configuration
 
 	tmp, err := os.ReadFile(file)
@@ -23,6 +24,43 @@ func ReadConfig(file string) (Configuration, error) {
 		return Configuration{}, err
 	}
 	return config, nil
+}
+
+func ReadAddressJSON(file string) (Address, error) {
+	var config Address
+
+	tmp, err := os.ReadFile(file)
+	if err != nil {
+		return Address{}, err
+	}
+
+	err = json.Unmarshal(tmp, &config)
+	if err != nil {
+		return Address{}, err
+	}
+	return config, nil
+}
+
+func WriteJSON(address Address, fileName string) bool {
+	file, err := os.Create(fileName)
+	if err != nil {
+		fmt.Println("Opening file error: ", err)
+		return false
+	}
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			fmt.Println("Closing file error: ", err)
+		}
+	}(file)
+
+	encoder := json.NewEncoder(file)
+
+	if err := encoder.Encode(address); err != nil {
+		return false
+	}
+
+	return true
 }
 
 func Random(min, max int) int {

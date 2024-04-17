@@ -19,7 +19,7 @@ func main() {
 		log.Fatal("Wrong service format: ", err)
 	}
 
-	config, err := utils.ReadConfig("/app/config.json")
+	config, err := utils.ReadConfigJSON("/app/config.json")
 	if err != nil {
 		log.Fatal("Configuration file reading error: ", err)
 	}

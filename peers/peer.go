@@ -15,7 +15,7 @@ import (
 var currentNode utils.NodeINFO
 
 func chooseAlgorithm() {
-	config, err := utils.ReadConfig("/app/config.json")
+	config, err := utils.ReadConfigJSON("/app/config.json")
 	if err != nil {
 		log.Fatal("Configuration file reading error: ", err)
 	}
@@ -41,7 +41,10 @@ func chooseAlgorithm() {
 }
 
 func main() {
-	config, err := utils.ReadConfig("/app/config.json")
+	fileName := "addressMem.json"
+
+	config, err := utils.ReadConfigJSON("/app/config.json")
+	addressFile, _ := utils.ReadAddressJSON("/app/" + fileName)
 
 	/* Init peer's service */
 	peerService := new(PeerServiceHandler)
@@ -58,7 +61,22 @@ func main() {
 		log.Fatal("Connection error: ", err)
 	}
 
-	address := list.Addr().String()
+	var address string
+
+	if len(addressFile.Address) == 0 || len(addressFile.Port) == 0 {
+		address = list.Addr().String()
+		host, port, _ := net.SplitHostPort(address)
+
+		addressFile.Address = host
+		addressFile.Port = ":" + port
+
+		err := utils.WriteJSON(addressFile, "/app/"+fileName)
+		if err == false {
+			fmt.Println("Write file error")
+		}
+	} else {
+		address = addressFile.Address + addressFile.Port
+	}
 
 	/* Register peer's service on Service Registry */
 	if err != nil {
