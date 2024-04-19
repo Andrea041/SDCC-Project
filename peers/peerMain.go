@@ -55,27 +55,33 @@ func main() {
 		log.Fatal("Wrong service format: ", err)
 	}
 
-	peerAddress := config.Peer.Address + config.Peer.Port
-	list, err := net.Listen("tcp", peerAddress)
-	if err != nil {
-		log.Fatal("Connection error: ", err)
-	}
-
 	var address string
+	var list net.Listener
 
+	/* Check if file is empty */
 	if len(addressFile.Address) == 0 || len(addressFile.Port) == 0 {
+		peerAddress := config.Peer.Address + config.Peer.Port
+		list, err = net.Listen("tcp", peerAddress)
+		if err != nil {
+			log.Fatal("Connection error: ", err)
+		}
+
 		address = list.Addr().String()
 		host, port, _ := net.SplitHostPort(address)
 
 		addressFile.Address = host
 		addressFile.Port = ":" + port
 
-		err := utils.WriteJSON(addressFile, "/app/"+fileName)
-		if err == false {
+		ret := utils.WriteJSON(addressFile, "/app/"+fileName)
+		if ret == false {
 			fmt.Println("Write file error")
 		}
 	} else {
 		address = addressFile.Address + addressFile.Port
+		list, err = net.Listen("tcp", address)
+		if err != nil {
+			log.Fatal("Connection error: ", err)
+		}
 	}
 
 	/* Register peer's service on Service Registry */

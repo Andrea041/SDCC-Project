@@ -20,6 +20,7 @@ func (NodeHandler) ManageNode(peerAddress utils.PeerAddr, nodeInfo *utils.NodeIN
 			nodeInfo.Id = node.Id
 			nodeInfo.List.Nodes = nodeList.GetAllNodes()
 			nodeInfo.Leader = node.Leader
+			nodeInfo.Participant = node.Participant
 
 			return nil
 		}
@@ -35,7 +36,7 @@ redo:
 	}
 
 	var newNode utils.Node
-	newNode = utils.Node{Id: newID, Address: peerAddress.PeerAddress, Leader: -1}
+	newNode = utils.Node{Id: newID, Address: peerAddress.PeerAddress, Leader: -1, Participant: false}
 
 	nodeList.AddNode(newNode)
 
@@ -43,6 +44,7 @@ redo:
 	nodeInfo.Id = newID
 	nodeInfo.List.Nodes = nodeList.GetAllNodes()
 	nodeInfo.Leader = newNode.Leader
+	nodeInfo.Participant = newNode.Participant // setting false because new node in system is initially set as non-participant
 
 	/* Update list to the other node in DS */
 	for _, node := range nodes {

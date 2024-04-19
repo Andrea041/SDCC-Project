@@ -122,7 +122,18 @@ func ChangAndRoberts(currNode utils.NodeINFO) {
 	peer, err := utils.DialTimeout("tcp", currNode.List.GetNode(currNode.Leader).Address, 5*time.Second)
 	if err != nil {
 		fmt.Println("--- Start new election ---")
-		ElectionChangAndRoberts(currNode, currNode.Id)
+
+		/* Specify starting message */
+		mex := utils.Message{StartingMex: true}
+		err = peer.Call("PeerServiceHandler.ElectionMessageCR", mex, nil)
+		if err != nil {
+			log.Fatal("Election message forward failed: ", err)
+		}
+
+		err = peer.Close()
+		if err != nil {
+			log.Fatal("Closing connection error: ", err)
+		}
 		return
 	}
 

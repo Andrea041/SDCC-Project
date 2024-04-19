@@ -11,7 +11,7 @@ func (nl *NodeList) GetAllNodes() []Node {
 func (nl *NodeList) GetNode(nodeId int) NodeINFO {
 	for _, nodeWanted := range nl.Nodes {
 		if nodeWanted.Id == nodeId {
-			return NodeINFO{nodeWanted.Id, nodeWanted.Address, *nl, nodeWanted.Leader}
+			return NodeINFO{nodeWanted.Id, nodeWanted.Address, *nl, nodeWanted.Leader, nodeWanted.Participant}
 		}
 	}
 	return NodeINFO{}
@@ -20,7 +20,7 @@ func (nl *NodeList) GetNode(nodeId int) NodeINFO {
 func (nl *NodeList) GetNodeByIndex(index int) NodeINFO {
 	for i, nodeWanted := range nl.Nodes {
 		if i == index {
-			return NodeINFO{nodeWanted.Id, nodeWanted.Address, *nl, nodeWanted.Leader}
+			return NodeINFO{nodeWanted.Id, nodeWanted.Address, *nl, nodeWanted.Leader, nodeWanted.Participant}
 		}
 	}
 	return NodeINFO{}
