@@ -30,27 +30,22 @@ func (PeerServiceHandler) ElectionMessageCR(mex utils.Message, _ *int) error {
 
 	/* First message case */
 	if mex.StartingMex == true {
-		mex.StartingMex = false
-		if mex.MexID > currID {
-			currentNode.Participant = true
+		mex.StartingMex = false // reset flag
+		currentNode.Participant = true
 
-			go algorithm.ElectionChangAndRoberts(currentNode.List.GetNode(currID), mex.MexID)
-		} else if mex.MexID < currID {
-			currentNode.Participant = true
-			mex.MexID = currID
-
-			go algorithm.ElectionChangAndRoberts(currentNode.List.GetNode(currID), mex.MexID)
-		}
+		go algorithm.ElectionChangAndRoberts(currentNode.List.GetNode(currID), currID)
 	} else {
 		if mex.MexID > currID {
 			currentNode.Participant = true
+
 			go algorithm.ElectionChangAndRoberts(currentNode.List.GetNode(currID), mex.MexID)
 		} else if mex.MexID < currID && currentNode.Participant == false {
 			currentNode.Participant = true
 			mex.MexID = currID
+
 			go algorithm.ElectionChangAndRoberts(currentNode.List.GetNode(currID), mex.MexID)
 		} else if mex.MexID < currID && currentNode.Participant == true {
-			fmt.Println("Algorithm error, message discarded")
+			fmt.Println("Message discarded!")
 			return nil // discard message
 		} else if mex.MexID == currID {
 			currentNode.Leader = currID

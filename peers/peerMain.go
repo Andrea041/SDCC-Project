@@ -3,15 +3,15 @@ package main
 import (
 	"SDCCproject/algorithm"
 	"SDCCproject/utils"
-	"time"
 
 	"fmt"
 	"log"
 	"net"
 	"net/rpc"
+	"time"
 )
 
-// Global variable to hold peer status in DS
+// currentNode Global variable to hold peer status in DS
 var currentNode utils.NodeINFO
 
 func chooseAlgorithm() {

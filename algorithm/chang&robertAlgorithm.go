@@ -114,7 +114,9 @@ func ChangAndRoberts(currNode utils.NodeINFO) {
 	/* Performed only when new peer enter the system because it has Leader = -1 */
 	if currNode.Id > currNode.Leader {
 		fmt.Println("--- Start new election ---")
-		ElectionChangAndRoberts(currNode, currNode.Id)
+		/* Perform first iteration of algorithm */
+		firstIteration(currNode)
+
 		return
 	}
 
@@ -122,18 +124,9 @@ func ChangAndRoberts(currNode utils.NodeINFO) {
 	peer, err := utils.DialTimeout("tcp", currNode.List.GetNode(currNode.Leader).Address, 5*time.Second)
 	if err != nil {
 		fmt.Println("--- Start new election ---")
+		/* Perform first iteration of algorithm */
+		firstIteration(currNode)
 
-		/* Specify starting message */
-		mex := utils.Message{StartingMex: true}
-		err = peer.Call("PeerServiceHandler.ElectionMessageCR", mex, nil)
-		if err != nil {
-			log.Fatal("Election message forward failed: ", err)
-		}
-
-		err = peer.Close()
-		if err != nil {
-			log.Fatal("Closing connection error: ", err)
-		}
 		return
 	}
 
@@ -147,5 +140,21 @@ func ChangAndRoberts(currNode utils.NodeINFO) {
 	err = peer.Call("PeerServiceHandler.CheckLeaderStatus", currNode, nil)
 	if err != nil {
 		log.Printf("Ping to leader failed: %v\n", err)
+	}
+}
+
+// firstIteration compute first iteration of algorithm
+func firstIteration(currNode utils.NodeINFO) {
+	mex := utils.Message{StartingMex: true}
+	peer, err := utils.DialTimeout("tcp", currNode.List.GetNode(currNode.Id).Address, 5*time.Second)
+
+	err = peer.Call("PeerServiceHandler.ElectionMessageCR", mex, nil)
+	if err != nil {
+		log.Printf("Leader update error: %v", err)
+	}
+
+	err = peer.Close()
+	if err != nil {
+		log.Fatal("Closing connection error: ", err)
 	}
 }
