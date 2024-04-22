@@ -114,6 +114,7 @@ func ChangAndRoberts(currNode utils.NodeINFO) {
 	/* Performed only when new peer enter the system because it has Leader = -1 */
 	if currNode.Id > currNode.Leader {
 		fmt.Println("--- Start new election ---")
+
 		/* Perform first iteration of algorithm */
 		firstIteration(currNode)
 
@@ -124,6 +125,7 @@ func ChangAndRoberts(currNode utils.NodeINFO) {
 	peer, err := utils.DialTimeout("tcp", currNode.List.GetNode(currNode.Leader).Address, 5*time.Second)
 	if err != nil {
 		fmt.Println("--- Start new election ---")
+
 		/* Perform first iteration of algorithm */
 		firstIteration(currNode)
 
