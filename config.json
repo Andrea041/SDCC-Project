@@ -8,7 +8,7 @@
     "port": ":6789"
   },
   "algorithm": {
-    "ChangAndRobert": "true",
-    "Bully": "false"
+    "ChangAndRobert": "false",
+    "Bully": "true"
   }
 }

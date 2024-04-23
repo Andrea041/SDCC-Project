@@ -3,12 +3,12 @@ package main
 import (
 	"SDCCproject/algorithm"
 	"SDCCproject/utils"
+	"time"
 
 	"fmt"
 	"log"
 	"net"
 	"net/rpc"
-	"time"
 )
 
 // currentNode Global variable to hold peer status in DS
@@ -31,12 +31,12 @@ func chooseAlgorithm() {
 		}
 
 		/* Delay and print actual leader */
-		time.Sleep(time.Minute)
 		if currentNode.Leader == currentNode.Id {
 			fmt.Println("I am the leader!")
 		} else {
 			fmt.Printf("Leader: %d\n", currentNode.Leader)
 		}
+		time.Sleep(time.Minute)
 	}
 }
 
