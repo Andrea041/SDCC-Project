@@ -9,8 +9,6 @@ import (
 	"time"
 )
 
-var Ciao utils.Address
-
 func ElectionBully(currNode utils.NodeINFO) {
 	for _, node := range currNode.List.GetAllNodes() {
 		if node.Id > currNode.Id {
