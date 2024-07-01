@@ -1,4 +1,4 @@
-# Implementation of two distributed leader election algorithms for Distributed System & Cloud Computing course
+# Implementation of two distributed leader election algorithms
 
 ## Introduction
 A distributed system is a collection of independent network nodes that do not share memory. Each processor on every node has its own memory and communicates with others through the network. Network communication is implemented via a process on one machine communicating with a process on another machine.
