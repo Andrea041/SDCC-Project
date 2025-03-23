@@ -11,7 +11,7 @@ The algorithms are:
 - Bully Algorithm
 - Chang-Roberts Algorithm
 
-## Requirements & Instruction to run the code
+## Requirements & Instructions to run the code
 ### Software requirements
 Software that must be installed on your computer:
 - go 1.22.2 darwin/amd64 (or any compatible version)
